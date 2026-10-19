@@ -115,6 +115,7 @@ Building is not required to play this project, as prebuilt binaries (which do no
 * [Gamepad Motion Helpers](https://github.com/JibbSmart/GamepadMotionHelpers) for sensor fusion and calibration algorithms to implement gyro aiming
 * [Quest 64 Decompilation](https://github.com/Rainchus/Quest64-Decomp) for headers and some function definitions, used for making patches or some enhancements
 * [Ares emulator](https://github.com/ares-emulator/ares) for RSP vector instruction reference implementations, used in RSP recompilation
+* [Quest 64 Tale: Recompiled](https://github.com/boricuapab/quest64tale-recompiled) by boricuapab (GPL-3.0), the source of the Brian interpolation tagging, the skeleton patch joint-position fix, the widescreen screen-fade fix and the Quest 64 control names
 
 # Special Thanks:
 
