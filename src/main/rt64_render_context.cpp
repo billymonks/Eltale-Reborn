@@ -7,6 +7,7 @@
 #define HLSL_CPU
 #include "hle/rt64_application.h"
 #include "gbi/rt64_gbi_f3d.h"
+#include "gbi/rt64_gbi_rdp.h"
 #include "rt64_render_hooks.h"
 #include "overloaded.h"
 
@@ -24,11 +25,9 @@ static bool high_precision_fb_enabled = false;
 static uint8_t DMEM[0x1000];
 static uint8_t IMEM[0x1000];
 
-// Brian's model table supplies stable part identities. RT64's automatic
-// matching can pair the thin, similar hair polygons with another transform,
-// so tag each part's display list without changing its matrices or vertices.
 namespace {
 thread_local std::vector<size_t> brian_group_depths;
+thread_local std::vector<size_t> fade_group_depths;
 
 uint32_t rdram_word(RT64::State* state, uint32_t offset) {
     uint32_t value;
@@ -36,9 +35,61 @@ uint32_t rdram_word(RT64::State* state, uint32_t offset) {
     return value;
 }
 
+void quest64_scissor(RT64::State* state, RT64::DisplayList** dl) {
+    const uint8_t mode = (*dl)->p1(24, 2);
+    const int32_t ulx = (*dl)->p0(12, 12);
+    const int32_t uly = (*dl)->p0(0, 12);
+    const int32_t lrx = (*dl)->p1(12, 12);
+    const int32_t lry = (*dl)->p1(0, 12);
+    if (ulx == 8 * 4 && lrx == 312 * 4) {
+        // The 3D view's scissor leaves 8-pixel overscan margins. Widen it and
+        // the viewport clipping volume so RT64 treats the view, and fullscreen
+        // geometry drawn with it, as spanning the whole widescreen framebuffer.
+        state->rsp->clipRatios[0] = 2;
+        state->rsp->clipRatios[2] = -2;
+        state->rsp->viewportChanged = true;
+        state->rsp->modelViewProjChanged = true;
+        state->rdp->setScissor(mode, 0, uly, 320 * 4, lry);
+        return;
+    }
+    RT64::GBI_RDP::setScissor(state, dl);
+}
+
+void quest64_fill_rect(RT64::State* state, RT64::DisplayList** dl) {
+    const int32_t ulx = (*dl)->p1(12, 12);
+    const int32_t uly = (*dl)->p1(0, 12);
+    const int32_t lrx = (*dl)->p0(12, 12);
+    const int32_t lry = (*dl)->p0(0, 12);
+    if (ulx == 8 * 4 && uly == 8 * 4 && lrx == 311 * 4 && lry == 231 * 4) {
+        // Clear the whole framebuffer rather than the overscan-inset 4:3 area,
+        // so the columns revealed in widescreen don't keep stale pixels.
+        auto* rdp = state->rdp.get();
+        rdp->pushScissor();
+        rdp->setScissor(0, 0, 0, 320 * 4, 240 * 4, RT64::ExtendedAlignment());
+        rdp->fillRect(0, 0, 319 * 4, 239 * 4);
+        rdp->popScissor();
+        return;
+    }
+    RT64::GBI_RDP::fillRect(state, dl);
+}
+
+// Brian's model table supplies stable part identities. RT64's automatic
+// matching can pair the thin, similar hair polygons with another transform,
+// so tag each part's display list without changing its matrices or vertices.
 void quest64_model_list(RT64::State* state, RT64::DisplayList** dl) {
     const uint32_t address = state->rsp->fromSegmentedMasked((*dl)->w1);
     const bool call = (*dl)->p0(16, 1) == 0;
+    const bool fade = call && address == 0x4D4F0;
+    if (fade) {
+        // Screen fades are a fullscreen quad; stretch it to the output aspect
+        // ratio instead of keeping it in the centered 4:3 area.
+        state->rsp->matrixId(0x51464144, true, true, false,
+            G_EX_COMPONENT_SKIP, G_EX_COMPONENT_SKIP, G_EX_COMPONENT_SKIP,
+            G_EX_COMPONENT_SKIP, G_EX_COMPONENT_SKIP, G_EX_COMPONENT_SKIP,
+            G_EX_COMPONENT_SKIP, G_EX_COMPONENT_SKIP, G_EX_COMPONENT_SKIP,
+            G_EX_ORDER_LINEAR, G_EX_ASPECT_STRETCH, G_EX_EDIT_NONE, false, false);
+        state->rsp->modelViewProjChanged = true;
+    }
     int part = -1;
     // Verify the loaded Brian bank before interpreting its model table.
     if (call && rdram_word(state, 0x20606C) == 0x80206000) {
@@ -61,9 +112,16 @@ void quest64_model_list(RT64::State* state, RT64::DisplayList** dl) {
     }
     RT64::GBI_F3D::runDl(state, dl);
     if (part >= 0) brian_group_depths.push_back(state->returnAddressStack.size());
+    if (fade) fade_group_depths.push_back(state->returnAddressStack.size());
 }
 
 void quest64_end_list(RT64::State* state, RT64::DisplayList** dl) {
+    if (!fade_group_depths.empty() &&
+        fade_group_depths.back() == state->returnAddressStack.size()) {
+        state->rsp->popMatrixId(1, true);
+        state->rsp->modelViewProjChanged = true;
+        fade_group_depths.pop_back();
+    }
     if (!brian_group_depths.empty() &&
         brian_group_depths.back() == state->returnAddressStack.size()) {
         state->rsp->popMatrixId(1, false);
@@ -377,10 +435,13 @@ void zelda64::renderer::RT64Context::send_dl(const OSTask* task) {
     app->state->rsp->reset();
     app->interpreter->loadUCodeGBI(task->t.ucode & 0x3FFFFFF, task->t.ucode_data & 0x3FFFFFF, true);
     brian_group_depths.clear();
+    fade_group_depths.clear();
     auto* gbi = app->interpreter->hleGBI;
     if (gbi != nullptr && gbi->ucode == RT64::GBIUCode::F3DEX) {
         gbi->map[F3D_G_DL] = quest64_model_list;
         gbi->map[F3D_G_ENDDL] = quest64_end_list;
+        gbi->map[G_SETSCISSOR] = quest64_scissor;
+        gbi->map[G_FILLRECT] = quest64_fill_rect;
     }
     app->processDisplayLists(app->core.RDRAM, task->t.data_ptr & 0x3FFFFFF, 0, true);
 }
