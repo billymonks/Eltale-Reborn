@@ -2,9 +2,11 @@
 #include <cstring>
 #include <variant>
 #include <algorithm>
+#include <vector>
 
 #define HLSL_CPU
 #include "hle/rt64_application.h"
+#include "gbi/rt64_gbi_f3d.h"
 #include "rt64_render_hooks.h"
 #include "overloaded.h"
 
@@ -21,6 +23,56 @@ static bool high_precision_fb_enabled = false;
 
 static uint8_t DMEM[0x1000];
 static uint8_t IMEM[0x1000];
+
+// Brian's model table supplies stable part identities. RT64's automatic
+// matching can pair the thin, similar hair polygons with another transform,
+// so tag each part's display list without changing its matrices or vertices.
+namespace {
+thread_local std::vector<size_t> brian_group_depths;
+
+uint32_t rdram_word(RT64::State* state, uint32_t offset) {
+    uint32_t value;
+    std::memcpy(&value, state->fromRDRAM(offset), sizeof(value));
+    return value;
+}
+
+void quest64_model_list(RT64::State* state, RT64::DisplayList** dl) {
+    const uint32_t address = state->rsp->fromSegmentedMasked((*dl)->w1);
+    const bool call = (*dl)->p0(16, 1) == 0;
+    int part = -1;
+    // Verify the loaded Brian bank before interpreting its model table.
+    if (call && rdram_word(state, 0x20606C) == 0x80206000) {
+        for (int i = 0; i < 32; ++i) {
+            const uint32_t entry = rdram_word(state, 0x206000 + i * 4);
+            if (entry == 0) break;
+            if ((entry & 0x7FFFFF) == address) { part = i; break; }
+        }
+    }
+    if (part >= 0) {
+        // Component-wise matrix interpolation preserves the native shear and
+        // signed scale without introducing quaternion decomposition choices.
+        state->rsp->matrixId(0xB1000000U + part, true, false, false,
+            G_EX_COMPONENT_INTERPOLATE, G_EX_COMPONENT_INTERPOLATE,
+            G_EX_COMPONENT_INTERPOLATE, G_EX_COMPONENT_INTERPOLATE,
+            G_EX_COMPONENT_SKIP, G_EX_COMPONENT_SKIP, G_EX_COMPONENT_SKIP,
+            G_EX_COMPONENT_SKIP, G_EX_COMPONENT_SKIP,
+            G_EX_ORDER_LINEAR, G_EX_ASPECT_AUTO, G_EX_EDIT_NONE, false, false);
+        state->rsp->modelViewProjChanged = true;
+    }
+    RT64::GBI_F3D::runDl(state, dl);
+    if (part >= 0) brian_group_depths.push_back(state->returnAddressStack.size());
+}
+
+void quest64_end_list(RT64::State* state, RT64::DisplayList** dl) {
+    if (!brian_group_depths.empty() &&
+        brian_group_depths.back() == state->returnAddressStack.size()) {
+        state->rsp->popMatrixId(1, false);
+        state->rsp->modelViewProjChanged = true;
+        brian_group_depths.pop_back();
+    }
+    RT64::GBI_F3D::endDl(state, dl);
+}
+}
 
 struct TexturePackEnableAction {
     std::string mod_id;
@@ -324,6 +376,12 @@ void zelda64::renderer::RT64Context::send_dl(const OSTask* task) {
     check_texture_pack_actions();
     app->state->rsp->reset();
     app->interpreter->loadUCodeGBI(task->t.ucode & 0x3FFFFFF, task->t.ucode_data & 0x3FFFFFF, true);
+    brian_group_depths.clear();
+    auto* gbi = app->interpreter->hleGBI;
+    if (gbi != nullptr && gbi->ucode == RT64::GBIUCode::F3DEX) {
+        gbi->map[F3D_G_DL] = quest64_model_list;
+        gbi->map[F3D_G_ENDDL] = quest64_end_list;
+    }
     app->processDisplayLists(app->core.RDRAM, task->t.data_ptr & 0x3FFFFFF, 0, true);
 }
 
