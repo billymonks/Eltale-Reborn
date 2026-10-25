@@ -18,20 +18,21 @@ namespace recomp {
     // First parameter is the enum name, second parameter is the bit field for the input (or 0 if there is no associated one), third is the readable name.
     // TODO refactor this to allow projects to rename these, or get rid of the readable name and leave that up to individual projects to map.
     #define DEFINE_N64_BUTTON_INPUTS() \
-        DEFINE_INPUT(A, 0x8000, "Attack / Talk / Cast (A)") \
-        DEFINE_INPUT(B, 0x4000, "Change View / Cancel (B)") \
-        DEFINE_INPUT(Z, 0x2000, "Attack / Talk / Cast (Z)") \
-        DEFINE_INPUT(R, 0x0010, "Items (R)") \
-        DEFINE_INPUT(START, 0x1000, "Menu (Start)") \
-        DEFINE_INPUT(C_UP, 0x0008, "Fire Magic (C-Up)") \
-        DEFINE_INPUT(C_LEFT, 0x0002, "Earth Magic (C-Left)") \
-        DEFINE_INPUT(C_DOWN, 0x0004, "Water Magic (C-Down)") \
-        DEFINE_INPUT(C_RIGHT, 0x0001, "Wind Magic (C-Right)") \
-        DEFINE_INPUT(DPAD_UP, 0x0800, "D-Pad Up") \
-        DEFINE_INPUT(DPAD_RIGHT, 0x0100, "D-Pad Right") \
-        DEFINE_INPUT(DPAD_DOWN, 0x0400, "D-Pad Down") \
-        DEFINE_INPUT(DPAD_LEFT, 0x0200, "D-Pad Left") \
-        DEFINE_INPUT(L, 0x0020, "Camera Angle (L)")
+        DEFINE_INPUT(A, 0x8000, "A: Talk, confirm, attack") \
+        DEFINE_INPUT(B, 0x4000, "B: Cancel") \
+        DEFINE_INPUT(Z, 0x2000, "Right trigger: Items right") \
+        DEFINE_INPUT(R, 0x0010, "Y: Item menu") \
+        DEFINE_INPUT(START, 0x1000, "Start: Status and map") \
+        DEFINE_INPUT(C_UP, 0x0008, "D-pad Up: Spell menu") \
+        DEFINE_INPUT(C_LEFT, 0x0002, "D-pad Left: Spirit") \
+        DEFINE_INPUT(C_DOWN, 0x0004, "D-pad Down: Spirit") \
+        DEFINE_INPUT(C_RIGHT, 0x0001, "D-pad Right: Spirit") \
+        DEFINE_INPUT(DPAD_UP, 0x0800, "N64 D-pad Up") \
+        DEFINE_INPUT(DPAD_RIGHT, 0x0100, "N64 D-pad Right") \
+        DEFINE_INPUT(DPAD_DOWN, 0x0400, "N64 D-pad Down") \
+        DEFINE_INPUT(DPAD_LEFT, 0x0200, "N64 D-pad Left") \
+        DEFINE_INPUT(L, 0x0020, "Left trigger: Items left") \
+        DEFINE_INPUT(SPRINT, 0x0040, "X: Sprint")
 
     #define DEFINE_N64_AXIS_INPUTS() \
         DEFINE_INPUT(Y_AXIS_POS, 0, "Move Up") \
@@ -118,6 +119,8 @@ namespace recomp {
         std::vector<InputField> toggle_menu;
         std::vector<InputField> accept_menu;
         std::vector<InputField> apply_menu;
+
+        std::vector<InputField> sprint;
     };
 
     inline const std::vector<InputField>& get_default_mapping_for_input(const DefaultN64Mappings& defaults, const GameInput input) {
@@ -144,6 +147,7 @@ namespace recomp {
             case GameInput::TOGGLE_MENU: return defaults.toggle_menu;
             case GameInput::ACCEPT_MENU: return defaults.accept_menu;
             case GameInput::APPLY_MENU: return defaults.apply_menu;
+            case GameInput::SPRINT: return defaults.sprint;
             default: return empty_input_field;
         }
     }

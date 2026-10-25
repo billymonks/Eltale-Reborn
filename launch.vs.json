@@ -5,8 +5,8 @@
     {
       "type": "default",
       "project": "CMakeLists.txt",
-      "projectTarget": "Quest64Recompiled.exe",
-      "name": "Quest64Recompiled.exe",
+      "projectTarget": "EltaleReborn-PC.exe",
+      "name": "EltaleReborn-PC.exe",
       "currentDir": "${workspaceRoot}"
     }
   ]

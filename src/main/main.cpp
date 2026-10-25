@@ -45,8 +45,6 @@
 #include "../../patches/sound.h"
 #include "../../patches/misc_funcs.h"
 
-// #include "mods/mm_recomp_dpad_builtin.h"
-
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
@@ -144,7 +142,7 @@ ultramodern::renderer::WindowHandle create_window(ultramodern::gfx_callbacks_t::
     flags |= SDL_WINDOW_VULKAN;
 #endif
 
-    window = SDL_CreateWindow("Quest 64: Recompiled", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1600, 960,  flags);
+    window = SDL_CreateWindow(zelda64::program_name.data(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1600, 960,  flags);
 #if defined(__linux__)
     SetImageAsIcon("icons/512.png",window);
     if (ultramodern::renderer::get_graphics_config().wm_option == ultramodern::renderer::WindowMode::Fullscreen) { // TODO: Remove once RT64 gets native fullscreen support on Linux
@@ -638,8 +636,6 @@ int main(int argc, char** argv) {
         recomp::register_game(game);
     }
 
-    //recomp::mods::register_embedded_mod("mm_recomp_dpad_builtin", { (const uint8_t*)(mm_recomp_dpad_builtin), std::size(mm_recomp_dpad_builtin)});
-
     //REGISTER_FUNC(recomp_get_window_resolution);
     REGISTER_FUNC(recomp_get_target_aspect_ratio);
     REGISTER_FUNC(recomp_get_target_framerate);
@@ -661,6 +657,10 @@ int main(int argc, char** argv) {
     zelda64::register_patches();
     // recomputil::init_extended_actor_data();
     zelda64::load_config();
+    // Shipped mods stay in the mods folder next to the executable. This drops
+    // copies an older build left in the app folder and registers that folder
+    // for the scan.
+    zelda64::install_bundled_mods();
 
     recomp::rsp::callbacks_t rsp_callbacks{
         .get_rsp_microcode = get_rsp_microcode,

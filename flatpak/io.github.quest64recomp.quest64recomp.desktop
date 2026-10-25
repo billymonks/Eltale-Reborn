@@ -1,8 +1,8 @@
 [Desktop Entry]
-Name=Quest 64: Recompiled
-Exec=/app/bin/Quest64Recompiled
+Name=Eltale Reborn
+Exec=/app/bin/EltaleReborn-PC
 Type=Application
 Icon=io.github.quest64recomp.quest64recomp
 Categories=Game;
-Comment=Static recompilation of Quest 64 for PC.
+Comment=Eltale Reborn for PC, a Quest 64: Recompiled build.
 MimeType=x-scheme-handler/quest64recomp

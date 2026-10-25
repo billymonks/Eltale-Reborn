@@ -95,14 +95,14 @@ jobs:
           cmake --build cmake-build --config ${{ matrix.type }} --target Quest64Recompiled -j $(nproc)
       - name: Prepare Archive
         run: |
-          mv cmake-build/Quest64Recompiled Quest64Recompiled
+          mv cmake-build/EltaleReborn-PC EltaleReborn-PC
           rm -rf assets/scss
-          tar -czf Quest64Recompiled.tar.gz Quest64Recompiled assets/ recompcontrollerdb.txt
+          tar -czf EltaleReborn-PC.tar.gz EltaleReborn-PC assets/ mods/ recompcontrollerdb.txt
       - name: Archive Quest64Recomp
         uses: actions/upload-artifact@v4
         with:
           name: Quest64Recompiled-${{ runner.os }}-X64-${{ matrix.type }}
-          path: Quest64Recompiled.tar.gz
+          path: EltaleReborn-PC.tar.gz
       - name: Build AppImage
         run: |-
           ./.github/linux/appimage.sh 
@@ -243,14 +243,14 @@ jobs:
           cmake --build cmake-build --config ${{ matrix.type }} --target Quest64Recompiled -j $(nproc)
       - name: Prepare Archive
         run: |
-          mv cmake-build/Quest64Recompiled Quest64Recompiled
+          mv cmake-build/EltaleReborn-PC EltaleReborn-PC
           rm -rf assets/scss
-          tar -czf Quest64Recompiled.tar.gz Quest64Recompiled assets/ recompcontrollerdb.txt
+          tar -czf EltaleReborn-PC.tar.gz EltaleReborn-PC assets/ mods/ recompcontrollerdb.txt
       - name: Archive Quest64Recomp
         uses: actions/upload-artifact@v4
         with:
           name: Quest64Recompiled-${{ runner.os }}-ARM64-${{ matrix.type }}
-          path: Quest64Recompiled.tar.gz
+          path: EltaleReborn-PC.tar.gz
       - name: Build AppImage
         run: |-
           ./.github/linux/appimage.sh
@@ -334,29 +334,30 @@ jobs:
           SDL2_VERSION: ${{ inputs.SDL2_VERSION }}
       - name: Prepare Archive
         run: |
-          Move-Item -Path "cmake-build/Quest64Recompiled.exe" -Destination "Quest64Recompiled.exe"
+          Move-Item -Path "cmake-build/EltaleReborn-PC.exe" -Destination "EltaleReborn-PC.exe"
           Move-Item -Path "cmake-build/dxcompiler.dll" -Destination "dxcompiler.dll"
           Move-Item -Path "cmake-build/dxil.dll" -Destination "dxil.dll"
           Move-Item -Path "cmake-build/SDL2.dll" -Destination "SDL2.dll"
-          Move-Item -Path "cmake-build/Quest64Recompiled.pdb" -Destination "Quest64Recompiled.pdb"
+          Move-Item -Path "cmake-build/EltaleReborn-PC.pdb" -Destination "EltaleReborn-PC.pdb"
           Remove-Item -Path "assets/scss" -Recurse -Force
       - name: Archive Quest64Recomp
         uses: actions/upload-artifact@v4
         with:
           name: Quest64Recompiled-${{ runner.os }}-${{ matrix.type }}
           path: |
-            Quest64Recompiled.exe
+            EltaleReborn-PC.exe
             dxcompiler.dll
             dxil.dll
             SDL2.dll
             assets/
+            mods/
             recompcontrollerdb.txt
       - name: Archive Debug Files
         uses: actions/upload-artifact@v4
         with:
           name: Quest64Recompiled-PDB-${{ matrix.type }}
           path: |
-            Quest64Recompiled.pdb
+            EltaleReborn-PC.pdb
   build-macos:
     runs-on: macos-14
     strategy:

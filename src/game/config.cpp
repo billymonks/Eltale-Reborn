@@ -311,6 +311,7 @@ void assign_all_mappings(recomp::InputDevice device, const recomp::DefaultN64Map
     assign_mapping_complete(device, recomp::GameInput::TOGGLE_MENU, values.toggle_menu);
     assign_mapping_complete(device, recomp::GameInput::ACCEPT_MENU, values.accept_menu);
     assign_mapping_complete(device, recomp::GameInput::APPLY_MENU, values.apply_menu);
+    assign_mapping_complete(device, recomp::GameInput::SPRINT, values.sprint);
 };
 
 void zelda64::reset_input_bindings() {

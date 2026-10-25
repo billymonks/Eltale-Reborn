@@ -22,6 +22,9 @@ build/
 *.lib
 *.pdb
 
+# Player folder staged by the Quest64Recompiled post-build step
+/dist/
+
 # Data dumps
 data_dump.toml
 dump.toml

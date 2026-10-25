@@ -10,7 +10,7 @@ if (CMAKE_GENERATOR STREQUAL "Xcode")
 endif()
 
 # Use generator expressions to get the absolute path to the bundle
-set(APPS "${BUILD_PREFIX}Quest64Recompiled.app/Contents/MacOS/Quest64Recompiled")
+set(APPS "${BUILD_PREFIX}Quest64Recompiled.app/Contents/MacOS/EltaleReborn-PC")
 
 # Set up framework search paths
 set(DIRS "${BUILD_PREFIX}Quest64Recompiled.app/Contents/Frameworks")

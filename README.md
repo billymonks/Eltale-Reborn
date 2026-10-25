@@ -1,9 +1,40 @@
-# Quest 64: Recompiled
-[Quest 64: Recompiled](https://github.com/Rainchus/Quest64-Recomp) is a project that uses [N64: Recompiled](https://github.com/Mr-Wiseguy/N64Recomp) to **statically recompile** Quest 64 into a native port with many new features, enhancements, and extensive mod support. This project uses [RT64](https://github.com/rt64/rt64) as the rendering engine to provide some of these enhancements.
+# Eltale Reborn (PC)
 
-### [Check out the latest release here](https://github.com/Rainchus/Quest64-Recomp/releases/latest).
+This is [Quest 64: Recompiled](https://github.com/Rainchus/Quest64-Recomp), built as **Eltale Reborn** for PC. It uses the Dreamcast controller layout. The mods that ship with it live in a `mods` folder next to the executable, and the game loads that folder directly.
 
-### **This repository and its releases do not contain game assets. The original game is required to build or run this project.**
+The game is still Quest 64. The window title and the settings folder are Eltale Reborn's; the mod files themselves are ordinary `qs64` mods and still load in any other Quest 64: Recompiled build.
+
+### **This repository and its releases do not contain the ROM. The original game is required to build or run this project.**
+
+## Mods folder
+
+Put `.nrm` files in `mods/` next to `EltaleReborn-PC.exe`. The game reads that folder on launch and does not copy those files into AppData, so deleting an `.nrm` there removes it from the Mods menu. The current files are `eltale_reborn.nrm` and `quest64_modern_gameplay.nrm`. After rebuilding the mods, copy the new files over those (or run `scripts/stage_mods.ps1` if the mod repo is checked out beside this one). Turning a mod off is done in the Mods menu; that choice is remembered.
+
+Mods installed with Install Mods, or by dropping a file on the window, are stored in the app mods folder (`%LOCALAPPDATA%\EltaleReborn-PC\mods` on Windows). That folder is not a second copy of the shipped mods.
+
+Saves and settings for this build are kept separate from an official Quest 64: Recompiled install. See [Where is the savefile stored?](#where-is-the-savefile-stored).
+
+## Controls
+
+The default controller matches a Dreamcast pad (SDL's standard layout: A on the bottom, B on the right, Y on the top, X on the left). Adapters that report the triggers as shoulder buttons are bound there as well. Reset to defaults in the controls menu puts this layout back.
+
+| Dreamcast | Game action |
+| --- | --- |
+| Analog stick | Walk; move cursors |
+| A | Talk, confirm, attack |
+| B | Cancel, close menus |
+| D-pad | Spirits; up opens the spell menu |
+| Left trigger | Filter the items menu left |
+| Right trigger | Filter the items menu right |
+| X | Sprint |
+| Y | Item menu |
+| Start | Start menu (status, map) |
+
+Keyboard defaults are unchanged (WASD to walk, arrow keys for the spirits, Space for A). Sprint has no keyboard binding. The game still receives N64 buttons, so these bindings live only in this program. Dialogue that names a button follows the story mod's own "Controller names in dialogue" option.
+
+## About this port
+
+[Quest 64: Recompiled](https://github.com/Rainchus/Quest64-Recomp) uses [N64: Recompiled](https://github.com/Mr-Wiseguy/N64Recomp) to **statically recompile** Quest 64 into a native port. This project uses [RT64](https://github.com/rt64/rt64) as the rendering engine.
 
 ## Table of Contents
 * [System Requirements](#system-requirements)
@@ -57,7 +88,7 @@ Any aspect ratio is supported, with most effects modded to work correctly in wid
 **Note**: Some animation quirks can be seen at the edges of the screen in certain cutscenes when using very wide aspect ratios.
 
 #### Mod Support
-Install community made mods and texture packs! Mods can change any part of the game, including adding completely new features and content. You can install mods by simply dragging the mod files onto the game window before starting the game or by clicking the **Install Mods** button in the mod menu. Mods can be toggled in the mod menu, and some mods can be configured there as well.
+The Eltale Reborn mods ship in the `mods` folder next to the executable and are loaded from there. Other mods and texture packs can still be added by dragging the files onto the game window before starting the game, or with **Install Mods** in the mod menu. Mods can be toggled there, and some can be configured there as well.
 
 If you're interested in making texture packs, check out [the RT64 documentation](https://github.com/rt64/rt64/blob/main/TEXTURE-PACKS.md).
 
@@ -88,9 +119,11 @@ Static recompilation is the process of automatically translating an application 
 Unlike N64 ports in the past, this project is not based on the source code provided by a decompilation of the game. This is because static recompilation bypasses the need for decompiled source code when making a port, allowing ports to be made **without source code**. However, the reverse engineering work done by the decompilation team was invaluable for providing some of the enhancements featured in this project. For this reason, the project uses headers and some functions from the [Decompilation Project](https://github.com/Rainchus/Quest64-Decomp) in order to make modifications to the game. Many thanks to the decompilation team for all of the hard work they've done.
 
 #### Where is the savefile stored?
-- Windows: `%LOCALAPPDATA%\Quest64Recompiled\saves`
-- Linux: `~/.config/Quest64Recompiled/saves`
-- macOS: `~/Library/Application Support/Quest64Recompiled/saves`
+- Windows: `%LOCALAPPDATA%\EltaleReborn-PC\saves`
+- Linux: `~/.config/EltaleReborn-PC/saves`
+- macOS: `~/Library/Application Support/EltaleReborn-PC/saves`
+
+Saves, settings, and mods you install yourself are stored here. This build does not read or write `%LOCALAPPDATA%\Quest64Recompiled`. Mods that ship next to the executable are loaded from that folder and are not copied here.
 
 #### How do I choose a different ROM?
 **You don't.** This project is **only** a port of Quest 64, and it will only accept one specific ROM: the US version of the N64 release of Quest 64. ROMs in formats other than .z64 will be automatically converted, as long as it is the correct ROM. **It is not an emulator and it cannot run any arbitrary ROM.** 

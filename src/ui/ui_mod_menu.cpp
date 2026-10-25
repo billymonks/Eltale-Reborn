@@ -1,6 +1,7 @@
 ﻿#include "ui_mod_menu.h"
 #include "ui_utils.h"
 #include "recomp_ui.h"
+#include "zelda_config.h"
 #include "zelda_support.h"
 #include "zelda_render.h"
 
@@ -252,6 +253,7 @@ void ModMenu::refresh_mods(bool scan_mods) {
     }
 
     if (scan_mods) {
+        zelda64::install_bundled_mods();
         recomp::mods::scan_mods();
     }
     mod_details = recomp::mods::get_all_mod_details(game_mod_id);

@@ -7,8 +7,8 @@
 #include "recomp_input.h"
 
 namespace zelda64 {
-    constexpr std::u8string_view program_id = u8"Quest64Recompiled";
-    constexpr std::string_view program_name = "Quest 64: Recompiled";
+    constexpr std::u8string_view program_id = u8"EltaleReborn-PC";
+    constexpr std::string_view program_name = "Eltale Reborn";
 
     // TODO: Move loading configs to the runtime once we have a way to allow per-project customization.
     void load_config();
@@ -20,6 +20,10 @@ namespace zelda64 {
     void reset_single_input_binding(recomp::InputDevice device, recomp::GameInput input);
 
     std::filesystem::path get_app_folder_path();
+
+    // Drop stale copies of shipped mods from the app mods folder, and register
+    // the mods folder next to the executable so the game scans it directly.
+    void install_bundled_mods();
     
     bool get_debug_mode_enabled();
     void set_debug_mode_enabled(bool enabled);

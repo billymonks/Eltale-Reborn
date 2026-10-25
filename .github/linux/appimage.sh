@@ -18,23 +18,24 @@ curl -sSfLO "https://github.com/linuxdeploy/linuxdeploy-plugin-gtk/raw/master/li
 chmod a+x linuxdeploy*
  
 mkdir -p AppDir/usr/bin
-cp Quest64Recompiled AppDir/usr/bin/
+cp EltaleReborn-PC AppDir/usr/bin/
 cp -r assets/ AppDir/usr/bin/
 cp recompcontrollerdb.txt AppDir/usr/bin/
+cp -r mods/ AppDir/usr/bin/
 cp icons/512.png AppDir/Quest64Recompiled.png
 cp .github/linux/Quest64Recompiled.desktop AppDir/
 
 "./linuxdeploy-$LINUX_DEPLOY_ARCH.AppImage" --appimage-extract
 mv squashfs-root/ deploy
-./deploy/AppRun --appdir=AppDir/ -d AppDir/Quest64Recompiled.desktop -i AppDir/Quest64Recompiled.png -e AppDir/usr/bin/Quest64Recompiled --plugin gtk
+./deploy/AppRun --appdir=AppDir/ -d AppDir/Quest64Recompiled.desktop -i AppDir/Quest64Recompiled.png -e AppDir/usr/bin/EltaleReborn-PC --plugin gtk
 sed -i 's/exec/#exec/g' AppDir/AppRun
 echo 'if [ -f "portable.txt" ]; then' >> AppDir/AppRun
 echo '    APP_FOLDER_PATH=$PWD' >> AppDir/AppRun
 echo '    cd "$this_dir"/usr/bin/' >> AppDir/AppRun
-echo '    APP_FOLDER_PATH=$APP_FOLDER_PATH ./Quest64Recompiled' >> AppDir/AppRun
+echo '    APP_FOLDER_PATH=$APP_FOLDER_PATH ./EltaleReborn-PC' >> AppDir/AppRun
 echo 'else' >> AppDir/AppRun
 echo '    cd "$this_dir"/usr/bin/' >> AppDir/AppRun
-echo '    ./Quest64Recompiled' >> AppDir/AppRun
+echo '    ./EltaleReborn-PC' >> AppDir/AppRun
 echo 'fi' >> AppDir/AppRun
 
 # Remove conflicting libraries

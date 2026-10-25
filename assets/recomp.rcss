@@ -521,25 +521,31 @@ scrollbarhorizontal sliderbar {
   opacity: 1;
 }
 .control-option .icon-button {
-  flex: 1 1 auto;
+  flex: 0 0 54dp;
 }
 
 .control-option__label {
-  flex: 2 1 300dp;
+  flex: 1 1 0dp;
+  min-width: 0;
   height: auto;
+  overflow: hidden;
   white-space: nowrap;
+  font-size: 20dp;
+  font-weight: 600;
+  letter-spacing: 0.3dp;
+  line-height: 24dp;
 }
 
 .control-option__bindings {
   display: flex;
   position: relative;
-  flex: 2 1 400dp;
+  flex: 0 0 188dp;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  width: 100%;
+  width: 188dp;
   height: 56dp;
-  padding: 0 12dp 0 4dp;
+  padding: 0 8dp 0 4dp;
 }
 
 .control-option__binding {
@@ -1222,8 +1228,8 @@ scrollbarhorizontal sliderbar {
 
 .input-config__mappings {
   display: block;
-  flex: 1 1 auto;
-  min-width: 640dp;
+  flex: 1.2 1 560dp;
+  min-width: 520dp;
   height: 100%;
 }
 
@@ -1240,11 +1246,11 @@ scrollbarhorizontal sliderbar {
 
 .input-config__visual-wrapper {
   display: block;
-  flex: 1 1 100%;
+  flex: 0.85 1 460dp;
   width: auto;
-  max-width: 1040.4444444444dp;
+  max-width: 680dp;
   height: auto;
-  max-height: 780.3333333333dp;
+  max-height: 640dp;
   margin: auto 0;
 }
 
@@ -1447,6 +1453,13 @@ scrollbarhorizontal sliderbar {
   opacity: 0.25;
 }
 [cur-input=Y_AXIS_POS] .input-viz[visual-input~=Y_AXIS_POS] {
+  opacity: 1;
+}
+
+.input-viz[visual-input~=SPRINT] {
+  opacity: 0.25;
+}
+[cur-input=SPRINT] .input-viz[visual-input~=SPRINT] {
   opacity: 1;
 }
 
@@ -1659,6 +1672,119 @@ scrollbarhorizontal sliderbar {
   min-width: 1dp;
   height: 128dp;
   margin-right: 10dp;
+}
+
+.dc-pad__shoulders {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 10dp 22dp 0 22dp;
+}
+.dc-shoulder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.dc-shoulder__name {
+  margin-bottom: 2dp;
+  color: #9AA0A6;
+  font-size: 14dp;
+  font-weight: 700;
+  letter-spacing: 0.4dp;
+  line-height: 16dp;
+}
+.dc-trigger {
+  width: 112dp;
+  height: 40dp;
+  border-width: 2dp;
+  border-color: #17D6E8;
+  border-radius: 14dp;
+  background-color: rgba(23, 214, 232, 0.28);
+}
+.dc-trigger--right {
+  border-color: #F86039;
+  background-color: rgba(248, 96, 57, 0.28);
+}
+.dc-pad__body {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8dp 18dp 16dp 18dp;
+}
+.dc-pad__left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.dc-pad__stick.input-config__visual-stick {
+  width: 132dp;
+  height: 132dp;
+}
+.dc-pad__stick .input-viz__dpad-arrow {
+  width: 40dp;
+  height: 40dp;
+}
+.dc-pad__dpad.input-viz.input-viz__dpad {
+  width: 148dp;
+  height: 148dp;
+  margin-top: 10dp;
+}
+.dc-pad__dpad.input-viz.input-viz__dpad > svg {
+  width: 148dp;
+  height: 148dp;
+}
+.dc-pad__dpad .input-viz__dpad-arrow {
+  width: 42dp;
+  height: 42dp;
+}
+.dc-pad__start {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 28dp;
+}
+.dc-pad__face {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.dc-face {
+  position: relative;
+  width: 196dp;
+  height: 196dp;
+}
+.dc-face__lr, .dc-face__du {
+  display: flex;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+.dc-face__lr {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+.dc-face__du {
+  flex-direction: column-reverse;
+  align-items: center;
+  justify-content: space-between;
+}
+.dc-btn--a svg {
+  image-color: #3DDC5A;
+}
+.dc-btn--b svg {
+  image-color: #E23B3B;
+}
+.dc-btn--x svg {
+  image-color: #4C6FFF;
+}
+.dc-btn--y svg {
+  image-color: #E6C229;
 }
 
 .button {
@@ -2077,8 +2203,8 @@ scrollbarhorizontal sliderbar {
     Example layout:
 
         <button class="subtitle-title" disabled>
-            <h3>Zelda 64: Recompiled</h3>
-            <h1>Ocarina of Time</h1>
+            <h3>Eltale Reborn</h3>
+            <h1>Quest 64</h1>
             <div class="subtitle-title__disclaimer">Coming Soon™</div>
         </button>
     - Variants:

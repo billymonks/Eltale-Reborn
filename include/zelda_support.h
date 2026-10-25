@@ -9,6 +9,8 @@
 
 namespace zelda64 {
     std::filesystem::path get_program_path();
+    // Directory containing the executable. Empty if SDL cannot report it.
+    std::filesystem::path get_executable_directory();
     std::filesystem::path get_asset_path(const char* asset);
     void open_file_dialog(std::function<void(bool success, const std::filesystem::path& path)> callback);
     void open_file_dialog_multiple(std::function<void(bool success, const std::list<std::filesystem::path>& paths)> callback);

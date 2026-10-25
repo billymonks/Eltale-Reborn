@@ -2,8 +2,8 @@
 <component type="desktop-application">
   <id>io.github.quest64recomp.quest64recomp</id>
   
-  <name>Quest 64: Recompiled</name>
-  <summary>Static recompilation of Quest 64 for PC.</summary>
+  <name>Eltale Reborn</name>
+  <summary>Eltale Reborn for PC, built on Quest 64: Recompiled.</summary>
   
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-3.0+</project_license>

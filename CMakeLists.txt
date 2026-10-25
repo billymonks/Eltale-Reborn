@@ -144,8 +144,9 @@ add_custom_command(OUTPUT
                    DEPENDS ${CMAKE_SOURCE_DIR}/patches/patches.elf
 )
 
-# Main executable
+# Main executable. The CMake target stays Quest64Recompiled; the shipped binary is EltaleReborn-PC.
 add_executable(Quest64Recompiled)
+set_target_properties(Quest64Recompiled PROPERTIES OUTPUT_NAME "EltaleReborn-PC")
 
 set (SOURCES
     ${CMAKE_SOURCE_DIR}/src/main/main.cpp
@@ -157,6 +158,7 @@ set (SOURCES
     ${CMAKE_SOURCE_DIR}/src/game/input.cpp
     ${CMAKE_SOURCE_DIR}/src/game/controls.cpp
     ${CMAKE_SOURCE_DIR}/src/game/config.cpp
+    ${CMAKE_SOURCE_DIR}/src/game/bundled_mods.cpp
     ${CMAKE_SOURCE_DIR}/src/game/scene_table.cpp
     ${CMAKE_SOURCE_DIR}/src/game/debug.cpp
     ${CMAKE_SOURCE_DIR}/src/game/quicksaving.cpp
@@ -398,27 +400,44 @@ endif()
 build_vertex_shader(Quest64Recompiled "shaders/InterfaceVS.hlsl" "shaders/InterfaceVS.hlsl")
 build_pixel_shader(Quest64Recompiled "shaders/InterfacePS.hlsl" "shaders/InterfacePS.hlsl")
 
-# Embed all .nrm files in the "mods" directory
-file(GLOB NRM_FILES "${CMAKE_SOURCE_DIR}/mods/*.nrm")
-
-set(GENERATED_NRM_SOURCES "")
-
-foreach(NRM_FILE ${NRM_FILES})
-    get_filename_component(NRM_NAME ${NRM_FILE} NAME_WE)
-    set(OUT_C "${CMAKE_CURRENT_BINARY_DIR}/mods/${NRM_NAME}.c")
-    set(OUT_H "${CMAKE_CURRENT_BINARY_DIR}/mods/${NRM_NAME}.h")
-
-    add_custom_command(
-        OUTPUT ${OUT_C} ${OUT_H}
-        COMMAND file_to_c ${NRM_FILE} ${NRM_NAME} ${OUT_C} ${OUT_H}
-        DEPENDS ${NRM_FILE}
-    )
-
-    list(APPEND GENERATED_NRM_SOURCES ${OUT_C})
-endforeach()
-
-target_sources(Quest64Recompiled PRIVATE ${GENERATED_NRM_SOURCES})
-
 target_sources(Quest64Recompiled PRIVATE ${SOURCES})
+
+# Ship mods/*.nrm next to the executable. The game scans that folder on launch.
+# They are not compiled into the binary, so replacing an .nrm does not relink the game.
+add_custom_command(TARGET Quest64Recompiled POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_SOURCE_DIR}/mods"
+        "$<TARGET_FILE_DIR:Quest64Recompiled>/mods"
+    COMMENT "Copy the mods folder next to the executable"
+)
+
+# Player folder, separate from the Ninja object tree, so it can be zipped as-is.
+# Same layout as the Windows archive in .github/workflows/validate.yml.
+# Debug symbols stay next to the exe in the build tree.
+if (WIN32)
+    set(ELTALE_PLAYER_DIST "${CMAKE_SOURCE_DIR}/dist/EltaleReborn-PC")
+    add_custom_command(TARGET Quest64Recompiled POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E rm -rf "${ELTALE_PLAYER_DIST}"
+        COMMAND ${CMAKE_COMMAND} -E make_directory "${ELTALE_PLAYER_DIST}"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "$<TARGET_FILE:Quest64Recompiled>"
+            "${sdl2_SOURCE_DIR}/lib/x64/SDL2.dll"
+            "${CMAKE_SOURCE_DIR}/lib/rt64/src/contrib/dxc/bin/x64/dxil.dll"
+            "${CMAKE_SOURCE_DIR}/lib/rt64/src/contrib/dxc/bin/x64/dxcompiler.dll"
+            "${ELTALE_PLAYER_DIST}"
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${CMAKE_SOURCE_DIR}/assets"
+            "${ELTALE_PLAYER_DIST}/assets"
+        COMMAND ${CMAKE_COMMAND} -E rm -rf "${ELTALE_PLAYER_DIST}/assets/scss"
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${CMAKE_SOURCE_DIR}/mods"
+            "${ELTALE_PLAYER_DIST}/mods"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${CMAKE_SOURCE_DIR}/recompcontrollerdb.txt"
+            "${ELTALE_PLAYER_DIST}"
+        COMMENT "Stage player files in dist/EltaleReborn-PC"
+        VERBATIM
+    )
+endif()
 
 set_property(TARGET Quest64Recompiled PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
