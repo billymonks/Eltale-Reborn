@@ -1,157 +1,55 @@
-# Eltale Reborn (PC)
+# Eltale Reborn PC
 
-This is [Quest 64: Recompiled](https://github.com/Rainchus/Quest64-Recomp), built as **Eltale Reborn** for PC. It uses the Dreamcast controller layout. The mods that ship with it live in a `mods` folder next to the executable, and the game loads that folder directly.
+Eltale Reborn PC is a fork of [Quest 64: Recompiled](https://github.com/Rainchus/Quest64-Recomp) with a few modifications for playing the "Eltale Reborn:  Holy Magic Century" and "Quest 64: Modern Gameplay" mods. The mods come bundled with this release and attempt to improve the game in every way, resulting in a fresh RPG experience.
 
-The game is still Quest 64. The window title and the settings folder are Eltale Reborn's; the mod files themselves are ordinary `qs64` mods and still load in any other Quest 64: Recompiled build.
+This repository does not include the ROM. You need your own copy of the US Quest 64 ROM to play or to build.
 
-### **This repository and its releases do not contain the ROM. The original game is required to build or run this project.**
+## Saves
 
-## Mods folder
+Saves and settings for this build stay separate from a Quest 64: Recompiled install.
 
-Put `.nrm` files in `mods/` next to `EltaleReborn-PC.exe`. The game reads that folder on launch and does not copy those files into AppData, so deleting an `.nrm` there removes it from the Mods menu. The current files are `eltale_reborn.nrm` and `quest64_modern_gameplay.nrm`. After rebuilding the mods, copy the new files over those (or run `scripts/stage_mods.ps1` if the mod repo is checked out beside this one). Turning a mod off is done in the Mods menu; that choice is remembered.
+- Windows: `%LOCALAPPDATA%\EltaleReborn-PC`
+- Linux: `~/.config/EltaleReborn-PC`
+- macOS: `~/Library/Application Support/EltaleReborn-PC`
 
-Mods installed with Install Mods, or by dropping a file on the window, are stored in the app mods folder (`%LOCALAPPDATA%\EltaleReborn-PC\mods` on Windows). That folder is not a second copy of the shipped mods.
+Save files are in `saves` under that path. Put a file named `portable.txt` next to the executable and start the game from that folder to keep saves, settings, and installed mods there instead.
 
-Saves and settings for this build are kept separate from an official Quest 64: Recompiled install. See [Where is the savefile stored?](#where-is-the-savefile-stored).
+## Playing
+
+On the main menu, give it the US Quest 64 ROM. Another file format of that same ROM is converted for you. This build runs that ROM only.
+
+Graphics, audio, controls, and mods are in the in-game menus, with a mouse, a keyboard, or a controller. It runs at the monitor's refresh rate unless you set the framerate slider in the graphics menu. The framerate does not change gameplay. Widescreen and ultrawide both work, and the HUD can stay at 16:9 on an ultrawide display. Very wide aspect ratios can show animation quirks at the edge of some cutscenes. An external framerate cap, such as the one in the NVIDIA control panel, can stutter; use the in-game slider instead.
+
+Texture packs install the same way as mods. [RT64's texture pack notes](https://github.com/rt64/rt64/blob/main/TEXTURE-PACKS.md) describe the format.
+
+MSI Afterburner, Wallpaper Engine, and similar overlays can keep the game from rendering. Turn them off if the picture breaks.
+
+You need a GPU with Direct3D 12 (shader model 6), Vulkan 1.2, or Metal argument buffers tier 2. On x86-64 the CPU needs SSE4.1. A crash at startup is often an old graphics driver.
 
 ## Controls
 
-The default controller matches a Dreamcast pad (SDL's standard layout: A on the bottom, B on the right, Y on the top, X on the left). Adapters that report the triggers as shoulder buttons are bound there as well. Reset to defaults in the controls menu puts this layout back.
+Reset to defaults in the controls menu restores a Dreamcast pad: A on the bottom, B on the right, Y on the top, X on the left. Adapters that report the triggers as shoulder buttons get the same bindings.
 
-| Dreamcast | Game action |
-| --- | --- |
-| Analog stick | Walk; move cursors |
-| A | Talk, confirm, attack |
-| B | Cancel, close menus |
-| D-pad | Spirits; up opens the spell menu |
-| Left trigger | Filter the items menu left |
-| Right trigger | Filter the items menu right |
-| X | Sprint |
-| Y | Item menu |
-| Start | Start menu (status, map) |
+| Button        | Action                                      |
+| ------------- | ------------------------------------------- |
+| Stick         | Walk, and move cursors                      |
+| A             | Talk, confirm, attack                       |
+| B             | Cancel, close menus                         |
+| X             | Sprint                                      |
+| Y             | Item menu                                   |
+| D-pad         | Magic                                       |
+| Left trigger  | Scroll the item list left                   |
+| Right trigger | Scroll the item list right                  |
+| Start         | Open menu                                   |
 
-Keyboard defaults are unchanged (WASD to walk, arrow keys for the spirits, Space for A). Sprint has no keyboard binding. The game still receives N64 buttons, so these bindings live only in this program. Dialogue that names a button follows the story mod's own "Controller names in dialogue" option.
+Keyboard defaults: WASD to walk, the arrow keys for the spirits, Space for A, Left Shift for B, Q for the right trigger, E to scroll the item list left, R for the item menu, Enter for Start. Sprint has no keyboard key.
 
-## About this port
+## Credits
 
-[Quest 64: Recompiled](https://github.com/Rainchus/Quest64-Recomp) uses [N64: Recompiled](https://github.com/Mr-Wiseguy/N64Recomp) to **statically recompile** Quest 64 into a native port. This project uses [RT64](https://github.com/rt64/rt64) as the rendering engine.
+The port is forked from [Quest 64: Recompiled](https://github.com/Rainchus/Quest64-Recomp) by Rainchus, using [N64: Recompiled](https://github.com/Mr-Wiseguy/N64Recomp) and [RT64](https://github.com/rt64/rt64). Headers and a few functions come from the [Quest 64 decompilation](https://github.com/Rainchus/Quest64-Decomp).
 
-## Table of Contents
-* [System Requirements](#system-requirements)
-* [Features](#features)
-  * [Plug and Play](#plug-and-play)
-  * [Fully Intact N64 Effects](#fully-intact-n64-effects)
-  * [Easy-to-Use Menus](#easy-to-use-menus)
-  * [High Framerate Support](#high-framerate-support)
-  * [Widescreen and Ultrawide Support](#widescreen-and-ultrawide-support)
-  * [Additional Control Options](#additional-control-options)
-  * [Low Input Lag](#low-input-lag)
-  * [Instant Load Times](#instant-load-times)
-  * [Linux and Steam Deck Support](#linux-and-steam-deck-support)
-* [Planned Features](#planned-features)
-* [FAQ](#faq)
-* [Known Issues](#known-issues)
-* [Building](#building)
-* [Libraries Used and Projects Referenced](#libraries-used-and-projects-referenced)
+Eltale Reborn: Holy Magic Century and Quest 64: Modern Gameplay mods are created by Billy Monks.
 
-## System Requirements
-Currently, only a **Windows** exe is provided but other operating systems will be supported soon.<br/>
-A GPU supporting Direct3D 12.0 (Shader Model 6), Vulkan 1.2, or Metal Argument Buffers Tier 2 support is required to run this project. The oldest GPUs that should be supported for each vendor are:
-* GeForce GT 630
-* Radeon HD 7750 (the one from 2012, not to be confused with the RX 7000 series) and newer
-* Intel HD 510 (Skylake)
-* A Mac with Apple Silicon or an Intel 7th Gen CPU with MacOS 13.0+
+Also used: [RmlUi](https://github.com/mikke89/RmlUi), [lunasvg](https://github.com/sammycage/lunasvg), and [FreeType](https://freetype.org/) for the menus; [moodycamel::ConcurrentQueue](https://github.com/cameron314/concurrentqueue); [Gamepad Motion Helpers](https://github.com/JibbSmart/GamepadMotionHelpers); [Ares](https://github.com/ares-emulator/ares) for the RSP vector instruction references; and [Quest 64 Tale: Recompiled](https://github.com/boricuapab/quest64tale-recompiled) by boricuapab (GPL-3.0) for the Brian interpolation tagging, the skeleton joint-position fix, the widescreen screen-fade fix, and the Quest 64 control names.
 
-On x86-64 PCs, a CPU supporting the SSE4.1 instruction set is also required (Intel Core 2 Penryn series or AMD Bulldozer and newer). ARM64 builds will work on any ARM64 CPU.
-
-If you have issues with crashes on startup, make sure your graphics drivers are fully up to date. 
-
-## Features
-
-#### Plug and Play
-Simply provide your copy of the 1.0 North American version of the game in the main menu and start playing! This project will automatically load assets from the provided copy, so there is no need to go through a separate extraction step or build the game yourself. Other versions of the game may be supported in the future.
-
-#### Fully Intact N64 Effects
-A lot of care was put into RT64 to make sure all graphical effects were rendered exactly as they did originally on the N64. No workarounds or "hacks" were made to replicate these effects, with the only modifications to them being made for enhancement purposes such as widescreen support.
-
-#### Easy-to-Use Menus
-Gameplay settings, graphics settings, input mappings, and audio settings can all be configured with the in-game config menu. The menus can all be used with mouse, controller, or keyboard for maximum convenience.
-
-#### High Framerate Support
-Play at any framerate you want thanks to functionality provided by RT64! Game objects and terrain, texture scrolling, screen effects, and most HUD elements are all rendered at high framerates. By default, this project is configured to run at your monitor's refresh rate. You can also play at the original framerate of the game if you prefer. **Changing framerate has no effect on gameplay.**
-
-**Note**: External framerate limiters (such as the NVIDIA Control Panel) are known to potentially cause problems, so if you notice any stuttering then turn them off and use the manual framerate slider in the in-game graphics menu instead.
-
-#### Widescreen and Ultrawide Support
-Any aspect ratio is supported, with most effects modded to work correctly in widescreen. The HUD can also be positioned at 16:9 when using ultrawide aspect ratios if preferred.
-
-**Note**: Some animation quirks can be seen at the edges of the screen in certain cutscenes when using very wide aspect ratios.
-
-#### Mod Support
-The Eltale Reborn mods ship in the `mods` folder next to the executable and are loaded from there. Other mods and texture packs can still be added by dragging the files onto the game window before starting the game, or with **Install Mods** in the mod menu. Mods can be toggled there, and some can be configured there as well.
-
-If you're interested in making texture packs, check out [the RT64 documentation](https://github.com/rt64/rt64/blob/main/TEXTURE-PACKS.md).
-
-#### Additional Control Options
-Customize your experience by setting your stick deadzone to your liking, as well as adjusting the Y axis inversion for aiming.
-
-#### Low Input Lag
-This project has been optimized to have as little input lag as possible, making the game feel more responsive than ever!
-
-#### Instant Load Times
-Saving and loading files, going from place to place, and pausing all happen in the blink of an eye thanks to the game running natively on modern hardware.
-
-#### Linux and Steam Deck Support
-A Linux binary as well as a Flatpak is available for playing on most up-to-date distros, including on the Steam Deck.
-
-## Planned Features
-* Gyro Aiming
-* Randomizer
-* Ray Tracing and Higher Quality Model Replacements (via RT64)
-* Multi-language support with support for loading custom translations
-
-## FAQ
-
-#### What is static recompilation?
-Static recompilation is the process of automatically translating an application from one platform to another. For more details, check out the full description of how this project's recompilation works here: [N64: Recompiled](https://github.com/Mr-Wiseguy/N64Recomp).
-
-#### How is this related to the decompilation project?
-Unlike N64 ports in the past, this project is not based on the source code provided by a decompilation of the game. This is because static recompilation bypasses the need for decompiled source code when making a port, allowing ports to be made **without source code**. However, the reverse engineering work done by the decompilation team was invaluable for providing some of the enhancements featured in this project. For this reason, the project uses headers and some functions from the [Decompilation Project](https://github.com/Rainchus/Quest64-Decomp) in order to make modifications to the game. Many thanks to the decompilation team for all of the hard work they've done.
-
-#### Where is the savefile stored?
-- Windows: `%LOCALAPPDATA%\EltaleReborn-PC\saves`
-- Linux: `~/.config/EltaleReborn-PC/saves`
-- macOS: `~/Library/Application Support/EltaleReborn-PC/saves`
-
-Saves, settings, and mods you install yourself are stored here. This build does not read or write `%LOCALAPPDATA%\Quest64Recompiled`. Mods that ship next to the executable are loaded from that folder and are not copied here.
-
-#### How do I choose a different ROM?
-**You don't.** This project is **only** a port of Quest 64, and it will only accept one specific ROM: the US version of the N64 release of Quest 64. ROMs in formats other than .z64 will be automatically converted, as long as it is the correct ROM. **It is not an emulator and it cannot run any arbitrary ROM.** 
-
-Instead, you can change the game by installing mods. See the [mod support](#mod-support) section for details.
-
-#### Can you run this project as a portable application?
-Yes, if you place a file named `portable.txt` in the same folder as the executable then this project will run in portable mode. In portable mode, the save files, config files, and mods are placed in the same folder as the executable.
-
-## Known Issues
-* Overlays such as MSI Afterburner and other software such as Wallpaper Engine can cause performance issues with this project that prevent the game from rendering correctly. Disabling such software is recommended.
-
-## Building
-Building is not required to play this project, as prebuilt binaries (which do not contain game assets) can be found in the [Releases](https://github.com/Rainchus/Quest64-Recomp/releases/latest) section. Instructions on how to build this project can be found in the [BUILDING.md](BUILDING.md) file.
-
-## Libraries Used and Projects Referenced
-* [RT64](https://github.com/rt64/rt64) for the project's rendering engine
-* [RmlUi](https://github.com/mikke89/RmlUi) for building the menus and launcher
-* [lunasvg](https://github.com/sammycage/lunasvg) for SVG rendering, used by RmlUi
-* [FreeType](https://freetype.org/) for font rendering, used by RmlUi  
-* [moodycamel::ConcurrentQueue](https://github.com/cameron314/concurrentqueue) for semaphores and fast, lock-free MPMC queues
-* [Gamepad Motion Helpers](https://github.com/JibbSmart/GamepadMotionHelpers) for sensor fusion and calibration algorithms to implement gyro aiming
-* [Quest 64 Decompilation](https://github.com/Rainchus/Quest64-Decomp) for headers and some function definitions, used for making patches or some enhancements
-* [Ares emulator](https://github.com/ares-emulator/ares) for RSP vector instruction reference implementations, used in RSP recompilation
-* [Quest 64 Tale: Recompiled](https://github.com/boricuapab/quest64tale-recompiled) by boricuapab (GPL-3.0), the source of the Brian interpolation tagging, the skeleton patch joint-position fix, the widescreen screen-fade fix and the Quest 64 control names
-
-# Special Thanks:
-
-* [ZeldaRET](https://github.com/zeldaret) : for teaching me the fundamental knowledge of N64 decompilation.
-* [Decompals](https://github.com/decompals) : for helping in the initial disassembly and decompilation of the game.
-* [Wiseguy](https://github.com/Mr-Wiseguy) and [DarioSamo](https://github.com/DarioSamo): for creating [N64Recomp](https://github.com/N64Recomp) and [RT64](https://github.com/rt64/rt64), assisting with fantastic technical support along the way.
+Thanks to [ZeldaRET](https://github.com/zeldaret), [decompals](https://github.com/decompals), [Wiseguy](https://github.com/Mr-Wiseguy), and [DarioSamo](https://github.com/DarioSamo).

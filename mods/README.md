@@ -1,16 +1,12 @@
-# Mods shipped with Eltale Reborn (PC)
+# Mods
 
-`.nrm` and `.rtz` files in this folder are copied next to the executable on build. The game loads that folder directly. It does not copy them into `%LOCALAPPDATA%\EltaleReborn-PC\mods`.
+The game loads every `.nrm` and `.rtz` in this folder.
 
 | File | Mod |
 | --- | --- |
-| `eltale_reborn.nrm` | Eltale Reborn: Holy Magic Century |
-| `quest64_modern_gameplay.nrm` | Quest 64: Modern Gameplay |
+| `eltale_reborn.nrm` | Eltale Reborn: Holy Magic Century. Story, characters, and scenes. |
+| `quest64_modern_gameplay.nrm` | Quest 64: Modern Gameplay. Sprint, battles, and growth. Options are on its page in the Mods menu. |
 
-Replace those files after rebuilding the mods. From this repo, if Quest-64-Good-Edition is checked out beside it:
+Both start enabled. Turn one off in the Mods menu if you want to play without it.
 
-```
-scripts\stage_mods.ps1
-```
-
-Deleting a file from the mods folder next to the executable removes it from the Mods menu on the next launch. A mod installed separately, under a different filename, stays in the app mods folder.
+Other mod files can sit in this folder too. Mods added with Install Mods are stored with the saves, not here.

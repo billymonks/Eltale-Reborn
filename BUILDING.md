@@ -1,8 +1,8 @@
-# Building Guide
+# Building
 
-This guide will help you build the project on your local machine. The process will require you to provide a decompressed ROM of the 1.1 US version of the game.
+You need a decompressed US Quest 64 ROM. The steps below are: clone, install the compiler, run the recompiler, then build.
 
-These steps cover: decompressing the ROM, running the recompiler and finally building the project.
+In the game itself, use a normal ROM. The decompressed ROM is only for the recompiler.
 
 ## 1. Clone the Quest64Recomp Repository
 This project makes use of submodules so you will need to clone the repository with the `--recurse-submodules` flag.
@@ -30,7 +30,7 @@ In the setup process you'll need to select the following options and tools for i
 - C++ Clang Compiler for Windows
 - C++ CMake tools for Windows
 
-The other tool necessary will be `make` which can be installe via [Chocolatey](https://chocolatey.org/):
+You also need `make`, which you can install with [Chocolatey](https://chocolatey.org/):
 ```bash
 choco install make
 ```
@@ -45,11 +45,9 @@ After that, go back to the repository root, and run the following commands:
 ./RSPRecomp aspMain.toml
 ```
 
-## 4. Building the Project
+## 4. Building the project
 
-Finally, you can build the project! :rocket:
-
-On Windows, you can open the repository folder with Visual Studio, and you'll be able to `[build / run / debug]` the project from there.
+On Windows, open the repository folder in Visual Studio and build from there.
 
 If you prefer the command line or you're on a Unix platform you can build the project using CMake:
 
@@ -58,9 +56,8 @@ cmake -S . -B build-cmake -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang 
 cmake --build build-cmake --target Quest64Recompiled -j$(nproc) --config Release # or Debug
 ```
 
-## 5. Success
+## 5. Run it
 
-Voilà! You should now have an `EltaleReborn-PC` executable in the build directory (`EltaleReborn-PC.exe` on Windows). If you used Visual Studio this will be `out/build/x64-[Configuration]` and if you used the provided CMake commands then this will be `build-cmake`. You will need to run the executable out of the root folder of this project or copy the assets folder to the build folder to run it. The build also copies `mods/` next to the executable.
+The executable is `EltaleReborn-PC` (`EltaleReborn-PC.exe` on Windows). Visual Studio puts it in `out/build/x64-[Configuration]`. The CMake commands above put it in `build-cmake`. On Windows the build also stages a player folder at `dist/EltaleReborn-PC`.
 
-> [!IMPORTANT]  
-> In the game itself, you should be using a standard ROM, not the decompressed one.
+Run it from the repository root, or copy `assets` next to the executable. The build copies `mods` next to the executable as well.
