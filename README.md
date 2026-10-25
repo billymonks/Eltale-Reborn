@@ -2,9 +2,9 @@
 
 Eltale Reborn: Holy Magic Century is a modified PC Port of Quest 64 that overhauls the game into the RPG it should have been: a deeper story built on the original premise (Brian, his missing father Lord Bartholomy, the Eletale Book, Celtland), reactive NPCs, new events and side quests, and reworked progression with far less grind.  
 
-
-
 This repository does not include the ROM. You need your own copy of the US Quest 64 ROM to play or to build.
+
+A [Dreamcast port]([https://github.com/billymonks/Eltale-Reborn-DC-Port](https://github.com/billymonks/Eltale-Reborn-DC-Port)) is also available.
 
 ## Saves
 
@@ -47,6 +47,12 @@ Reset to defaults in the controls menu restores a Dreamcast pad: A on the bottom
 Keyboard defaults: WASD to walk, the arrow keys for the spirits, Space for A, Left Shift for B, Q for the right trigger, E to scroll the item list left, R for the item menu, Enter for Start. Sprint has no keyboard key.
 
 ## Credits
+
+Eltale Reborn is an independent, noncommercial fan modification. Not affiliated with or endorsed by Imagineer, SEGA, Nintendo, THQ, or Konami.
+
+Original game © 1998 Imagineer Co., Ltd.
+
+
 
 The port is forked from [Quest 64: Recompiled](https://github.com/Rainchus/Quest64-Recomp) by Rainchus, using [N64: Recompiled](https://github.com/Mr-Wiseguy/N64Recomp) and [RT64](https://github.com/rt64/rt64). Headers and a few functions come from the [Quest 64 decompilation](https://github.com/Rainchus/Quest64-Decomp).
 
