@@ -1,6 +1,8 @@
 # Eltale Reborn PC
 
-Eltale Reborn PC is a fork of [Quest 64: Recompiled](https://github.com/Rainchus/Quest64-Recomp) with a few modifications for playing the "Eltale Reborn:  Holy Magic Century" and "Quest 64: Modern Gameplay" mods. The mods come bundled with this release and attempt to improve the game in every way, resulting in a fresh RPG experience.
+Eltale Reborn: Holy Magic Century is a modified PC Port of Quest 64 that overhauls the game into the RPG it should have been: a deeper story built on the original premise (Brian, his missing father Lord Bartholomy, the Eletale Book, Celtland), reactive NPCs, new events and side quests, and reworked progression with far less grind.  
+
+
 
 This repository does not include the ROM. You need your own copy of the US Quest 64 ROM to play or to build.
 
