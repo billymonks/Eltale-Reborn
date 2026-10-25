@@ -35,14 +35,22 @@ void quest64_scissor(RT64::State* state, RT64::DisplayList** dl) {
     const int32_t lrx = (*dl)->p1(12, 12);
     const int32_t lry = (*dl)->p1(0, 12);
     if (ulx == 8 * 4 && lrx == 312 * 4) {
-        // The 3D view's scissor leaves 8-pixel overscan margins. Widen it and
-        // the viewport clipping volume so RT64 treats the view, and fullscreen
-        // geometry drawn with it, as spanning the whole widescreen framebuffer.
+        // The 3D view's scissor leaves 8-pixel overscan margins on every side.
+        // The viewport already covers the full 320x240 framebuffer, so those
+        // rows are drawn and then discarded. Open the scissor, and widen the
+        // horizontal clipping volume so fullscreen geometry spans the
+        // widescreen framebuffer as well.
+        int32_t top = uly;
+        int32_t bottom = lry;
+        if (uly == 8 * 4 && lry == 232 * 4) {
+            top = 0;
+            bottom = 240 * 4;
+        }
         state->rsp->clipRatios[0] = 2;
         state->rsp->clipRatios[2] = -2;
         state->rsp->viewportChanged = true;
         state->rsp->modelViewProjChanged = true;
-        state->rdp->setScissor(mode, 0, uly, 320 * 4, lry);
+        state->rdp->setScissor(mode, 0, top, 320 * 4, bottom);
         return;
     }
     RT64::GBI_RDP::setScissor(state, dl);
