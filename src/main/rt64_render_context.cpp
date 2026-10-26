@@ -206,6 +206,8 @@ RT64::UserConfiguration::InternalColorFormat to_rt64(ultramodern::renderer::High
     }
 }
 
+extern "C" int recomp_smooth_transparency;
+
 void set_application_user_config(RT64::Application* application, const ultramodern::renderer::GraphicsConfig& config) {
     switch (config.res_option) {
         default:
@@ -244,6 +246,9 @@ void set_application_user_config(RT64::Application* application, const ultramode
     application->userConfig.refreshRate = to_rt64(config.rr_option);
     application->userConfig.refreshRateTarget = config.rr_manual_value;
     application->userConfig.internalColorFormat = to_rt64(config.hpfb_option);
+    application->userConfig.textureFiltering = config.tf_option != ultramodern::renderer::TextureFiltering::Off;
+    application->userConfig.smoothTransparency = config.transparency_option == ultramodern::renderer::TransparencyMode::Smooth;
+    recomp_smooth_transparency = application->userConfig.smoothTransparency;
     application->userConfig.displayBuffering = RT64::UserConfiguration::DisplayBuffering::Triple;
 }
 

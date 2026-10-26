@@ -23,6 +23,9 @@ constexpr std::u8string_view graphics_filename = u8"graphics.json";
 constexpr std::u8string_view controls_filename = u8"controls.json";
 constexpr std::u8string_view sound_filename = u8"sound.json";
 
+// Read by the recompiled candle and battle-octagon drawers.
+extern "C" int recomp_smooth_transparency = 1;
+
 constexpr auto res_default            = ultramodern::renderer::Resolution::Auto;
 constexpr auto hr_default             = ultramodern::renderer::HUDRatioMode::Clamp16x9;
 constexpr auto api_default            = ultramodern::renderer::GraphicsApi::Auto;
@@ -30,6 +33,8 @@ constexpr auto ar_default             = ultramodern::renderer::AspectRatio::Orig
 constexpr auto msaa_default           = ultramodern::renderer::Antialiasing::MSAA2X;
 constexpr auto rr_default             = ultramodern::renderer::RefreshRate::Manual;
 constexpr auto hpfb_default           = ultramodern::renderer::HighPrecisionFramebuffer::Auto;
+constexpr auto tf_default             = ultramodern::renderer::TextureFiltering::On;
+constexpr auto transparency_default   = ultramodern::renderer::TransparencyMode::Smooth;
 constexpr int ds_default              = 1;
 constexpr int rr_manual_default       = 60;
 constexpr bool developer_mode_default = true;
@@ -100,6 +105,8 @@ namespace ultramodern {
             {"msaa_option",     config.msaa_option},
             {"rr_option",       config.rr_option},
             {"hpfb_option",     config.hpfb_option},
+            {"tf_option",       config.tf_option},
+            {"transparency_option", config.transparency_option},
             {"rr_manual_value", config.rr_manual_value},
             {"developer_mode",  config.developer_mode},
         };
@@ -115,6 +122,9 @@ namespace ultramodern {
         config.msaa_option      = from_or_default(j, "msaa_option",     msaa_default);
         config.rr_option        = from_or_default(j, "rr_option",       rr_default);
         config.hpfb_option      = from_or_default(j, "hpfb_option",     hpfb_default);
+        config.tf_option        = from_or_default(j, "tf_option",       tf_default);
+        config.transparency_option = from_or_default(j, "transparency_option", transparency_default);
+        recomp_smooth_transparency = config.transparency_option == renderer::TransparencyMode::Smooth;
         config.rr_manual_value  = from_or_default(j, "rr_manual_value", rr_manual_default);
         config.developer_mode   = from_or_default(j, "developer_mode",  developer_mode_default);
     }
@@ -350,6 +360,9 @@ void reset_graphics_options() {
     new_config.msaa_option = msaa_default;
     new_config.rr_option = rr_default;
     new_config.hpfb_option = hpfb_default;
+    new_config.tf_option = tf_default;
+    new_config.transparency_option = transparency_default;
+    recomp_smooth_transparency = 1;
     new_config.rr_manual_value = rr_manual_default;
     new_config.developer_mode = developer_mode_default;
     ultramodern::renderer::set_graphics_config(new_config);
