@@ -1,4 +1,5 @@
 #include "patches.h"
+#include "misc_funcs.h"
 
 typedef float MtxF_t[4][4];
 typedef union {
@@ -324,8 +325,14 @@ static void gfx_words(Gfx** gfx, u32 w0, u32 w1) {
 }
 
 // Queues a shadow under an actor for func_800118D4 to draw.
+// Advanced lighting casts real shadows, so the flat ones are left out.
 RECOMP_PATCH void func_80011860(f32 x, f32 y, f32 z, f32 rotX, f32 rotY, f32 rotZ, f32 scale) {
     u32 index = gNumShadowsToDrawThisFrame;
+
+    if (recomp_get_advanced_lighting_enabled()) {
+        sSkelShadowObject = NULL;
+        return;
+    }
 
     if (index < ACTOR_SHADOW_MAX) {
         ActorShadow* shadow = &gActorShadows[index];

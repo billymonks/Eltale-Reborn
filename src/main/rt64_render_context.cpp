@@ -15,6 +15,7 @@
 #include "ultramodern/config.hpp"
 
 #include "zelda_render.h"
+#include "quest64_lighting.h"
 #include "recomp_ui.h"
 #include "concurrentqueue.h"
 
@@ -248,6 +249,7 @@ void set_application_user_config(RT64::Application* application, const ultramode
     application->userConfig.internalColorFormat = to_rt64(config.hpfb_option);
     application->userConfig.textureFiltering = config.tf_option != ultramodern::renderer::TextureFiltering::Off;
     application->userConfig.smoothTransparency = config.transparency_option == ultramodern::renderer::TransparencyMode::Smooth;
+    application->userConfig.advancedLighting = config.advanced_lighting_option == ultramodern::renderer::AdvancedLighting::On;
     recomp_smooth_transparency = application->userConfig.smoothTransparency;
     application->userConfig.displayBuffering = RT64::UserConfiguration::DisplayBuffering::Triple;
 }
@@ -418,6 +420,7 @@ void zelda64::renderer::RT64Context::send_dl(const OSTask* task) {
         gbi->map[G_SETSCISSOR] = quest64_scissor;
         gbi->map[G_FILLRECT] = quest64_fill_rect;
     }
+    app->state->setSceneLight(quest64::scene_light_from_game(app->core.RDRAM));
     app->processDisplayLists(app->core.RDRAM, task->t.data_ptr & 0x3FFFFFF, 0, true);
 }
 

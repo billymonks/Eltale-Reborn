@@ -303,7 +303,7 @@
                                 data-checked="transparency_option"
                                 value="Smooth"
                                 id="transparency_smooth"
-                                style="nav-up: #tf_on; nav-down: #apply_button"
+                                style="nav-up: #tf_on; nav-down: #lighting_off"
                             />
                             <label class="config-option__tab-label" for="transparency_smooth">Smooth</label>
                             <input type="radio"
@@ -313,9 +313,35 @@
                                 data-checked="transparency_option"
                                 value="Flicker"
                                 id="transparency_flicker"
-                                style="nav-up: #tf_off; nav-down: #apply_button"
+                                style="nav-up: #tf_off; nav-down: #lighting_on"
                             />
                             <label class="config-option__tab-label" for="transparency_flicker">Flicker</label>
+                        </div>
+                    </div>
+
+                    <div class="config-option" data-event-mouseover="set_cur_config_index(9)">
+                        <label class="config-option__title">Advanced Lighting</label>
+                        <div class="config-option__list">
+                            <input type="radio"
+                                data-event-blur="set_cur_config_index(-1)"
+                                data-event-focus="set_cur_config_index(9)"
+                                name="advancedlighting"
+                                data-checked="advanced_lighting_option"
+                                value="Off"
+                                id="lighting_off"
+                                style="nav-up: #transparency_smooth; nav-down: #apply_button"
+                            />
+                            <label class="config-option__tab-label" for="lighting_off">Off</label>
+                            <input type="radio"
+                                data-event-blur="set_cur_config_index(-1)"
+                                data-event-focus="set_cur_config_index(9)"
+                                name="advancedlighting"
+                                data-checked="advanced_lighting_option"
+                                value="On"
+                                id="lighting_on"
+                                style="nav-up: #transparency_flicker; nav-down: #apply_button"
+                            />
+                            <label class="config-option__tab-label" for="lighting_on">On</label>
                         </div>
                     </div>
 
@@ -360,6 +386,9 @@
                     <p data-if="cur_config_index == 8">
                         Some effects, such as candle flames and the octagons in battle, fake transparency by flickering pixels on and off. That blends together on a CRT and strobes on a modern display. <b>Flicker</b> keeps the original look. <b>Smooth</b> draws those effects with real transparency instead.
                     </p>
+                    <p data-if="cur_config_index == 9">
+                        Experimental. Places one directional light in each 3D scene and draws its shadow onto the geometry. Flat oval shadows under characters are hidden while this is on. The HUD stays as the game drew it. This costs performance. <b>Off</b> keeps the original lighting.
+                    </p>
                 </div>
             </div>
             <div class="config__footer">
@@ -372,7 +401,7 @@
                         data-attrif-disabled="!options_changed"
                         onclick="apply_options"
                         id="apply_button"
-                        style="nav-up:#transparency_smooth"
+                        style="nav-up:#lighting_off"
                     >
                         <div class="button__label">Apply<span class="prompt-font-sm">{{gfx_help__apply}}</span></div>
                     </button>

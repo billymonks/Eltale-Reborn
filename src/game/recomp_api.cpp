@@ -127,6 +127,10 @@ extern "C" void recomp_get_film_grain_enabled(uint8_t* rdram, recomp_context* ct
     _return(ctx, static_cast<s32>(zelda64::get_film_grain_mode() == zelda64::FilmGrainMode::On));
 }
 
+extern "C" void recomp_get_advanced_lighting_enabled(uint8_t* rdram, recomp_context* ctx) {
+    _return(ctx, static_cast<s32>(ultramodern::renderer::get_graphics_config().advanced_lighting_option == ultramodern::renderer::AdvancedLighting::On));
+}
+
 extern "C" void recomp_load_overlays(uint8_t * rdram, recomp_context * ctx) {
     u32 rom = _arg<0, u32>(rdram, ctx);
     PTR(void) ram = _arg<1, PTR(void)>(rdram, ctx);

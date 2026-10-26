@@ -160,6 +160,7 @@ set (SOURCES
     ${CMAKE_SOURCE_DIR}/src/game/config.cpp
     ${CMAKE_SOURCE_DIR}/src/game/bundled_mods.cpp
     ${CMAKE_SOURCE_DIR}/src/game/scene_table.cpp
+    ${CMAKE_SOURCE_DIR}/src/game/scene_lighting.cpp
     ${CMAKE_SOURCE_DIR}/src/game/debug.cpp
     ${CMAKE_SOURCE_DIR}/src/game/quicksaving.cpp
     ${CMAKE_SOURCE_DIR}/src/game/recomp_api.cpp

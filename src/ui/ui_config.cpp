@@ -651,6 +651,7 @@ public:
         bind_option(constructor, "rr_option", &new_options.rr_option);
         bind_option(constructor, "tf_option", &new_options.tf_option);
         bind_option(constructor, "transparency_option", &new_options.transparency_option);
+        bind_option(constructor, "advanced_lighting_option", &new_options.advanced_lighting_option);
         constructor.BindFunc("rr_manual_value",
             [](Rml::Variant& out) {
                 out = new_options.rr_manual_value;
