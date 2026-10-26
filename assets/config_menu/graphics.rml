@@ -320,7 +320,7 @@
                     </div>
 
                     <div class="config-option" data-event-mouseover="set_cur_config_index(9)">
-                        <label class="config-option__title">Advanced Lighting</label>
+                        <label class="config-option__title">Advanced Lighting (Early, Broken, Experimental)</label>
                         <div class="config-option__list">
                             <input type="radio"
                                 data-event-blur="set_cur_config_index(-1)"
@@ -387,7 +387,7 @@
                         Some effects, such as candle flames and the octagons in battle, fake transparency by flickering pixels on and off. That blends together on a CRT and strobes on a modern display. <b>Flicker</b> keeps the original look. <b>Smooth</b> draws those effects with real transparency instead.
                     </p>
                     <p data-if="cur_config_index == 9">
-                        Experimental. Places one directional light in each 3D scene and draws its shadow onto the geometry. Flat oval shadows under characters are hidden while this is on. The HUD stays as the game drew it. This costs performance. <b>Off</b> keeps the original lighting.
+                        <b>Early, broken and experimental.</b> Expect glitches: shadows can lose resolution or disappear in large areas. Places one directional light in each 3D scene and draws its shadow onto the geometry. Flat oval shadows under characters are hidden while this is on. The HUD stays as the game drew it. This costs performance. <b>Off</b> keeps the original lighting.
                     </p>
                 </div>
             </div>
