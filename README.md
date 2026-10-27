@@ -4,7 +4,7 @@ Eltale Reborn: Holy Magic Century is a modified PC Port of Quest 64 that overhau
 
 This repository does not include the ROM. You need your own copy of the US Quest 64 ROM to play or to build.
 
-A [Dreamcast port]([https://github.com/billymonks/Eltale-Reborn-DC-Port](https://github.com/billymonks/Eltale-Reborn-DC-Port)) is also available.
+A [Dreamcast port](https://github.com/billymonks/Eltale-Reborn-DC-Port) is also available.
 
 ## Saves
 
@@ -58,6 +58,6 @@ The port is forked from [Quest 64: Recompiled](https://github.com/Rainchus/Quest
 
 Eltale Reborn: Holy Magic Century and Quest 64: Modern Gameplay mods are created by Billy Monks.
 
-Also used: [RmlUi](https://github.com/mikke89/RmlUi), [lunasvg](https://github.com/sammycage/lunasvg), and [FreeType](https://freetype.org/) for the menus; [moodycamel::ConcurrentQueue](https://github.com/cameron314/concurrentqueue); [Gamepad Motion Helpers](https://github.com/JibbSmart/GamepadMotionHelpers); [Ares](https://github.com/ares-emulator/ares) for the RSP vector instruction references; and [Quest 64 Tale: Recompiled](https://github.com/boricuapab/quest64tale-recompiled) by boricuapab (GPL-3.0) for the Brian interpolation tagging, the skeleton joint-position fix, the widescreen screen-fade fix, and the Quest 64 control names.
+Also used: [RmlUi](https://github.com/mikke89/RmlUi), [lunasvg](https://github.com/sammycage/lunasvg), and [FreeType](https://freetype.org/) for the menus; [moodycamel::ConcurrentQueue](https://github.com/cameron314/concurrentqueue); [Gamepad Motion Helpers](https://github.com/JibbSmart/GamepadMotionHelpers); [Ares](https://github.com/ares-emulator/ares) for the RSP vector instruction references; and [Quest 64 Tale: Recompiled](https://github.com/boricuapab/quest64tale-recompiled) by boricuapab (GPL-3.0) inspired some of the fixes.
 
 Thanks to [ZeldaRET](https://github.com/zeldaret), [decompals](https://github.com/decompals), [Wiseguy](https://github.com/Mr-Wiseguy), and [DarioSamo](https://github.com/DarioSamo).
