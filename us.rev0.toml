@@ -31,3 +31,15 @@ before_vram = 0x80024690
 func = "dma_write"
 text = "load_overlays(ctx->r4, ctx->r5, ctx->r6);"
 before_vram = 0x80024260
+
+# Rumble follows a sound effect as it actually starts. Delay 0 plays here ($a0 the id,
+# $a3 the scaled volume). A delayed effect waits in func_80026658 and starts with $a0 the id.
+[[patches.hook]]
+func = "func_800268D4"
+text = "void recomp_sfx_rumble(unsigned char* rdram, int id, int volume); recomp_sfx_rumble(rdram, (int)(ctx->r4 & 255), (int)(ctx->r7 & 255));"
+before_vram = 0x80026940
+
+[[patches.hook]]
+func = "func_80026658"
+text = "void recomp_sfx_rumble(unsigned char* rdram, int id, int volume); recomp_sfx_rumble(rdram, (int)(ctx->r4 & 255), (int)(ctx->r5 & 255));"
+before_vram = 0x80026790

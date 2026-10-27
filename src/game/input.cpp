@@ -42,6 +42,99 @@ static struct {
     bool rumble_active;
 } InputState;
 
+// A one-shot pulse. The game never calls the Rumble Pak, so impacts request a pulse here
+// and the VI callback plays it out.
+static std::mutex rumble_pulse_mutex;
+static int pulse_low = 0;
+static int pulse_high = 0;
+static int pulse_frames = 0;
+
+static void request_rumble_pulse(int low, int high, int frames) {
+    if (low < 0) low = 0;
+    if (high < 0) high = 0;
+    if (low > 255) low = 255;
+    if (high > 255) high = 255;
+    if (frames < 1) frames = 1;
+
+    std::lock_guard lock{ rumble_pulse_mutex };
+    int playing = pulse_low > pulse_high ? pulse_low : pulse_high;
+    int incoming = low > high ? low : high;
+    if (pulse_frames > 0 && playing > incoming) {
+        return;
+    }
+    pulse_low = low;
+    pulse_high = high;
+    pulse_frames = frames;
+}
+
+// Sound ids from the effect table. A hit landing (0x18) is both a staff hit and Brian getting hurt.
+// A miss plays the swing (0x17), and footsteps reuse the door effect (0x21); neither of those rumbles
+// in a fight. A flyby or a swing only rumbles while a scene has Brian.
+struct SfxRumble {
+    uint8_t low;
+    uint8_t high;
+    uint8_t frames;
+    bool cutscene_only;
+};
+
+static constexpr int kSfxCount = 0x46;
+static constexpr SfxRumble kSfxRumble[kSfxCount] = {
+    [0x07] = { 220, 160, 16, false }, // Solvaring's rock, Mammon's last spell
+    [0x0A] = { 150, 110, 12, false }, // an enemy beaten
+    [0x0C] = { 200, 150, 14, false }, // a column bursting up
+    [0x0D] = { 240, 190, 16, false }, // an explosion
+    [0x0F] = { 100, 150, 8, false },  // Fire Ball
+    [0x10] = { 255, 170, 20, false }, // Rolling Rock, an earthquake
+    [0x15] = { 60, 90, 6, true },     // a projectile flying past
+    [0x16] = { 140, 160, 12, false }, // Ultimate Wind
+    [0x17] = { 80, 130, 7, true },    // a swing that missed, and Wind Cutter. Only the scene should feel it.
+    [0x18] = { 230, 200, 16, false }, // a hit that landed: staff hit, or Brian hurt
+    [0x29] = { 200, 170, 16, false }, // a big area spell
+    [0x2A] = { 150, 140, 12, false }, // Cyclone
+    [0x2C] = { 140, 100, 10, false }, // Rock
+    [0x2E] = { 200, 150, 14, false }, // dark magic
+    [0x31] = { 200, 160, 14, false }, // Beigis's second spell
+    [0x38] = { 90, 140, 8, false },   // Ice Knife
+};
+
+static int read_u16(uint8_t* rdram, uint32_t address) {
+    uintptr_t offset = (static_cast<uintptr_t>(address) ^ 2u) - 0x80000000u;
+    return *reinterpret_cast<const uint16_t*>(rdram + offset);
+}
+
+// Intro, ending, or a script holding Brian (talking, or the item state a scene pins him in).
+static bool cutscene_playing(uint8_t* rdram) {
+    constexpr uint32_t game_mode = 0x8007B2E0u;
+    constexpr uint32_t player_state = 0x8007BAB8u;
+    constexpr uint32_t battle_state = 0x8008C592u;
+    int mode = read_u16(rdram, game_mode);
+    if (mode == 4 || mode == 5) {
+        return true;
+    }
+    if (mode != 1) {
+        return false;
+    }
+    if (read_u16(rdram, battle_state) & 1) {
+        return false;
+    }
+    int state = read_u16(rdram, player_state);
+    return state == 7 || state == 11;
+}
+
+extern "C" void recomp_sfx_rumble(uint8_t* rdram, int id, int volume) {
+    if (rdram == nullptr || volume == 0 || id < 0 || id >= kSfxCount) {
+        return;
+    }
+    const SfxRumble& fx = kSfxRumble[id];
+    if (fx.low == 0 && fx.high == 0) {
+        return;
+    }
+    if (fx.cutscene_only && !cutscene_playing(rdram)) {
+        return;
+    }
+    request_rumble_pulse(fx.low, fx.high, fx.frames);
+}
+
 static struct {
     std::list<std::filesystem::path> files_dropped;
 } DropState;
@@ -538,25 +631,55 @@ static float smoothstep(float from, float to, float amount) {
     return std::lerp(from, to, amount);
 }
 
-// Update rumble to attempt to mimic the way n64 rumble ramps up and falls off
+static uint16_t scale_rumble_motor(int value) {
+    int strength = recomp::get_rumble_strength();
+    if (value < 0) value = 0;
+    if (value > 255) value = 255;
+    if (strength < 0) strength = 0;
+    if (strength > 100) strength = 100;
+    return (uint16_t)((value * strength * 65535) / (255 * 100));
+}
+
+// Update rumble to attempt to mimic the way n64 rumble ramps up and falls off.
+// Combat pulses override that envelope for a few VIs.
 void recomp::update_rumble() {
+    int low_pulse = 0;
+    int high_pulse = 0;
+    bool pulse = false;
+    {
+        std::lock_guard lock{ rumble_pulse_mutex };
+        if (pulse_frames > 0) {
+            pulse = true;
+            low_pulse = pulse_low;
+            high_pulse = pulse_high;
+            pulse_frames--;
+        }
+    }
+
     // Note: values are not accurate! just approximations based on feel
     if (InputState.rumble_active) {
         InputState.cur_rumble += 0.17f;
         if (InputState.cur_rumble > 1) InputState.cur_rumble = 1;
-    } else {
+    } else if (!pulse) {
         InputState.cur_rumble *= 0.92f;
         InputState.cur_rumble -= 0.01f;
         if (InputState.cur_rumble < 0) InputState.cur_rumble = 0;
     }
-    float smooth_rumble = smoothstep(0, 1, InputState.cur_rumble);
 
-    uint16_t rumble_strength = smooth_rumble * (recomp::get_rumble_strength() * 0xFFFF / 100);
+    uint16_t low_strength = 0;
+    uint16_t high_strength = 0;
+    if (pulse) {
+        low_strength = scale_rumble_motor(low_pulse);
+        high_strength = scale_rumble_motor(high_pulse);
+    } else {
+        float smooth_rumble = smoothstep(0, 1, InputState.cur_rumble);
+        high_strength = (uint16_t)(smooth_rumble * scale_rumble_motor(255));
+    }
     uint32_t duration = 1000000; // Dummy duration value that lasts long enough to matter as the game will reset rumble on its own.
     {
         std::lock_guard lock{ InputState.cur_controllers_mutex };
         for (const auto& controller : InputState.cur_controllers) {
-            SDL_GameControllerRumble(controller, 0, rumble_strength, duration);
+            SDL_GameControllerRumble(controller, low_strength, high_strength, duration);
         }
     }
 }
