@@ -69,7 +69,7 @@ static void request_rumble_pulse(int low, int high, int frames) {
 
 // Sound ids from the effect table. A hit landing (0x18) is both a staff hit and Brian getting hurt.
 // A miss plays the swing (0x17), and footsteps reuse the door effect (0x21); neither of those rumbles
-// in a fight. A flyby or a swing only rumbles while a scene has Brian.
+// in a fight. Fire Ball (0x0F) is a light cast sound, so it does not rumble. Earth impacts do.
 struct SfxRumble {
     uint8_t low;
     uint8_t high;
@@ -80,14 +80,12 @@ struct SfxRumble {
 static constexpr int kSfxCount = 0x46;
 static constexpr SfxRumble kSfxRumble[kSfxCount] = {
     [0x07] = { 220, 160, 16, false }, // Solvaring's rock, Mammon's last spell
-    [0x0A] = { 150, 110, 12, false }, // an enemy beaten
     [0x0C] = { 200, 150, 14, false }, // a column bursting up
     [0x0D] = { 240, 190, 16, false }, // an explosion
-    [0x0F] = { 100, 150, 8, false },  // Fire Ball
     [0x10] = { 255, 170, 20, false }, // Rolling Rock, an earthquake
     [0x15] = { 60, 90, 6, true },     // a projectile flying past
     [0x16] = { 140, 160, 12, false }, // Ultimate Wind
-    [0x17] = { 80, 130, 7, true },    // a swing that missed, and Wind Cutter. Only the scene should feel it.
+    [0x17] = { 80, 130, 7, true },    // a swing that missed, and Wind Cutter
     [0x18] = { 230, 200, 16, false }, // a hit that landed: staff hit, or Brian hurt
     [0x29] = { 200, 170, 16, false }, // a big area spell
     [0x2A] = { 150, 140, 12, false }, // Cyclone
