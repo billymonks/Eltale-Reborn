@@ -23,7 +23,7 @@ constexpr std::u8string_view graphics_filename = u8"graphics.json";
 constexpr std::u8string_view controls_filename = u8"controls.json";
 constexpr std::u8string_view sound_filename = u8"sound.json";
 
-// Read by the recompiled candle and battle-octagon drawers.
+// Read by the recompiled candle and battle-ring drawers.
 extern "C" int recomp_smooth_transparency = 1;
 
 constexpr auto res_default            = ultramodern::renderer::Resolution::Auto;

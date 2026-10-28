@@ -127,6 +127,12 @@ extern "C" void recomp_get_film_grain_enabled(uint8_t* rdram, recomp_context* ct
     _return(ctx, static_cast<s32>(zelda64::get_film_grain_mode() == zelda64::FilmGrainMode::On));
 }
 
+extern "C" int recomp_smooth_transparency;
+
+extern "C" void recomp_get_smooth_transparency(uint8_t* rdram, recomp_context* ctx) {
+    _return(ctx, static_cast<s32>(recomp_smooth_transparency != 0));
+}
+
 extern "C" void recomp_get_advanced_lighting_enabled(uint8_t* rdram, recomp_context* ctx) {
     _return(ctx, static_cast<s32>(ultramodern::renderer::get_graphics_config().advanced_lighting_option == ultramodern::renderer::AdvancedLighting::On));
 }
