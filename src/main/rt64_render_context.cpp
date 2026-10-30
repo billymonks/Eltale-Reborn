@@ -30,63 +30,10 @@ namespace {
 extern "C" int recomp_smooth_transparency;
 
 thread_local std::vector<size_t> fade_group_depths;
-thread_local bool fog_overscan_filled = false;
 
 // The circle mod draws the battle ring as many short copies of this ribbon.
 // They lie on the same plane, so a depth test makes the overlaps flicker.
 constexpr uint32_t RingRibbonDl = 0xC4F78;
-
-int fog_channel5(float channel) {
-    if (channel < 0.0f) channel = 0.0f;
-    if (channel > 1.0f) channel = 1.0f;
-    return static_cast<int>(channel * 31.0f + 0.5f);
-}
-
-void quest64_fill_fog_overscan(RT64::State* state) {
-    auto* rdp = state->rdp.get();
-    if (rdp->scissorStackSize < 1 || rdp->fogColorStackSize < 1 || rdp->fillColorStackSize < 1) {
-        return;
-    }
-
-    // The 3D scissor is either the original overscan box or the copy opened
-    // to the full framebuffer. Other screens keep their own rectangles.
-    const RT64::FixedRect& scissor = rdp->scissorRectStack[rdp->scissorStackSize - 1];
-    const bool view_scissor = scissor.ulx <= 8 * 4 && scissor.lrx >= 312 * 4 &&
-        scissor.uly <= 8 * 4 && scissor.lry >= 232 * 4;
-    if (!view_scissor) {
-        return;
-    }
-
-    const hlslpp::float4& fog = rdp->fogColorStack[rdp->fogColorStackSize - 1];
-    const int red = fog_channel5(fog.x);
-    const int green = fog_channel5(fog.y);
-    const int blue = fog_channel5(fog.z);
-    // A black fog color is the clear itself. Leave the margins alone.
-    if (red == 0 && green == 0 && blue == 0) {
-        return;
-    }
-
-    const uint16_t pixel = static_cast<uint16_t>((red << 11) | (green << 6) | (blue << 1) | 1);
-    const uint32_t fill = (static_cast<uint32_t>(pixel) << 16) | pixel;
-    const interop::OtherMode saved_mode = rdp->otherMode;
-    const uint32_t saved_fill = rdp->fillColorStack[rdp->fillColorStackSize - 1];
-    const uint32_t fill_mode = (saved_mode.H & ~(3U << G_MDSFT_CYCLETYPE)) | G_CYC_FILL;
-
-    // The background clear only covers the inset 4:3 view. Cave empty space is
-    // this fog color, so the rows outside that inset stay on the black clear.
-    rdp->setOtherMode(fill_mode, saved_mode.L);
-    rdp->setFillColor(fill);
-    rdp->pushScissor();
-    rdp->setScissor(0, 0, 0, 320 * 4, 240 * 4, RT64::ExtendedAlignment());
-    rdp->fillRect(0, 0, 319 * 4, 7 * 4);
-    rdp->fillRect(0, 232 * 4, 319 * 4, 239 * 4);
-    rdp->fillRect(0, 8 * 4, 7 * 4, 231 * 4);
-    rdp->fillRect(312 * 4, 8 * 4, 319 * 4, 231 * 4);
-    rdp->popScissor();
-    rdp->setFillColor(saved_fill);
-    rdp->setOtherMode(saved_mode.H, saved_mode.L);
-    fog_overscan_filled = true;
-}
 
 void quest64_scissor(RT64::State* state, RT64::DisplayList** dl) {
     const uint8_t mode = (*dl)->p1(24, 2);
@@ -132,13 +79,6 @@ void quest64_fill_rect(RT64::State* state, RT64::DisplayList** dl) {
         return;
     }
     RT64::GBI_RDP::fillRect(state, dl);
-}
-
-void quest64_set_fog_color(RT64::State* state, RT64::DisplayList** dl) {
-    RT64::GBI_RDP::setFogColor(state, dl);
-    if (!fog_overscan_filled) {
-        quest64_fill_fog_overscan(state);
-    }
 }
 
 void quest64_call_list(RT64::State* state, RT64::DisplayList** dl) {
@@ -504,14 +444,12 @@ void zelda64::renderer::RT64Context::send_dl(const OSTask* task) {
     app->state->rsp->reset();
     app->interpreter->loadUCodeGBI(task->t.ucode & 0x3FFFFFF, task->t.ucode_data & 0x3FFFFFF, true);
     fade_group_depths.clear();
-    fog_overscan_filled = false;
     auto* gbi = app->interpreter->hleGBI;
     if (gbi != nullptr && gbi->ucode == RT64::GBIUCode::F3DEX) {
         gbi->map[F3D_G_DL] = quest64_call_list;
         gbi->map[F3D_G_ENDDL] = quest64_end_list;
         gbi->map[G_SETSCISSOR] = quest64_scissor;
         gbi->map[G_FILLRECT] = quest64_fill_rect;
-        gbi->map[G_SETFOGCOLOR] = quest64_set_fog_color;
     }
     app->state->setSceneLight(quest64::scene_light_from_game(app->core.RDRAM));
     app->processDisplayLists(app->core.RDRAM, task->t.data_ptr & 0x3FFFFFF, 0, true);
