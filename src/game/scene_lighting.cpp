@@ -128,6 +128,12 @@ namespace {
         light.direction[2] = std::cos(pitch) * std::cos(yaw);
     }
 
+    void set_light_color(RT64::SceneLight& light, float r, float g, float b) {
+        light.lightColor[0] = r;
+        light.lightColor[1] = g;
+        light.lightColor[2] = b;
+    }
+
     void set_style(RT64::SceneLight& light, float r, float g, float b, float facing_floor, float strength) {
         light.shadowTint[0] = 1.0f + (r - 1.0f) * strength;
         light.shadowTint[1] = 1.0f + (g - 1.0f) * strength;
@@ -167,11 +173,14 @@ namespace {
 
         // Fade the shadows out near the horizon so the sun and moon hand over without a jump.
         const float strength = smoothstep(0.0f, 0.08f, arc);
+        const float lit = 0.35f + 0.65f * strength;
         if (sun_up) {
             set_style(light, 0.45f, 0.49f, 0.62f, 0.74f, strength);
+            set_light_color(light, 1.15f * lit, 1.02f * lit, 0.88f * lit);
         }
         else {
             set_style(light, 0.50f, 0.53f, 0.66f, 0.80f, strength);
+            set_light_color(light, 0.34f * lit, 0.40f * lit, 0.58f * lit);
         }
     }
 }
@@ -205,18 +214,22 @@ RT64::SceneLight quest64::scene_light_from_game(const uint8_t* rdram) {
         case LightKind::Interior:
             set_direction(light, room_light.yaw, room_light.pitch);
             set_style(light, 0.60f, 0.56f, 0.52f, 0.80f, 1.0f);
+            set_light_color(light, 0.85f, 0.75f, 0.62f);
             break;
         case LightKind::Castle:
             set_direction(light, room_light.yaw, room_light.pitch);
             set_style(light, 0.56f, 0.56f, 0.60f, 0.78f, 1.0f);
+            set_light_color(light, 0.75f, 0.78f, 0.88f);
             break;
         case LightKind::Cave:
             set_direction(light, room_light.yaw, room_light.pitch);
             set_style(light, 0.52f, 0.56f, 0.66f, 0.74f, 1.0f);
+            set_light_color(light, 0.55f, 0.62f, 0.78f);
             break;
         case LightKind::Mammon:
             set_direction(light, room_light.yaw, room_light.pitch);
             set_style(light, 0.58f, 0.50f, 0.66f, 0.78f, 1.0f);
+            set_light_color(light, 0.62f, 0.48f, 0.78f);
             break;
     }
 

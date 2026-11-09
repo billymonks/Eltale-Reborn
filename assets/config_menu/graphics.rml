@@ -320,7 +320,7 @@
                     </div>
 
                     <div class="config-option" data-event-mouseover="set_cur_config_index(9)">
-                        <label class="config-option__title">Advanced Lighting (Early, Broken, Experimental)</label>
+                        <label class="config-option__title">Ray Traced Lighting</label>
                         <div class="config-option__list">
                             <input type="radio"
                                 data-event-blur="set_cur_config_index(-1)"
