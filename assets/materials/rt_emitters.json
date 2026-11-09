@@ -1,0 +1,251 @@
+{
+  "_readme": [
+    "Shipped list of textures that emit light in the ray traced lighting. The game merges it into",
+    "Documents\\Quest64Recompiled\\Ray Tracing\\rt_emitters.json, where it also records every effect texture it finds under",
+    "\"candidates\" with a thumbnail in rt_emitters.html. Entries listed there by the user always win over this file.",
+    "Only entries under \"emitters\" with enabled true give light. color: \"sample\" or [r, g, b].",
+    "range scale multiplies how far the light reaches; max lights limits lights per texture (0 = no limit);",
+    "fade in / fade out frames: 0 for the defaults; only kinds: additive, blended, cutout, untextured;",
+    "only areas: [{\"map\": 4, \"room\": -1}] (room -1 = every room of the map)."
+  ],
+  "legacy glow for untextured effects": true,
+  "emitters": [
+    {
+      "id": "86FF11C464E7BD92",
+      "label": "item-use pillar of light (untextured polygon column)",
+      "source": "shipped",
+      "enabled": true,
+      "match": {
+        "texture": "none",
+        "combiner": [
+          "FC62CBFF",
+          "4FFE7E38"
+        ],
+        "triangles": [
+          21,
+          64
+        ]
+      },
+      "color": "sample",
+      "intensity": 1.5,
+      "range scale": 1,
+      "max lights": 2,
+      "fade in frames": 4,
+      "fade out frames": 12,
+      "only kinds": [
+        "untextured"
+      ],
+      "only areas": []
+    },
+    {
+      "id": "E35BC5D669C066D3",
+      "label": "staff hit sparks (untextured, small)",
+      "source": "shipped",
+      "enabled": true,
+      "match": {
+        "texture": "none",
+        "combiner": [
+          "FC62CBFF",
+          "4FFE7E38"
+        ],
+        "triangles": [
+          1,
+          20
+        ]
+      },
+      "color": "sample",
+      "intensity": 0.45,
+      "range scale": 1,
+      "max lights": 1,
+      "fade in frames": 2,
+      "fade out frames": 6,
+      "only kinds": [
+        "untextured"
+      ],
+      "only areas": []
+    },
+    {
+      "key": "5CB15AE9E50FA526",
+      "label": "knight buff spell (blue polygon aura)",
+      "enabled": true,
+      "color": "sample",
+      "intensity": 1.8,
+      "range scale": 1,
+      "max lights": 1,
+      "fade in frames": 3,
+      "fade out frames": 10,
+      "only kinds": [],
+      "only areas": []
+    },
+    {
+      "key": "22BD0E88C81DBF06",
+      "label": "orange flame animation frame (torch or candle, to confirm)",
+      "enabled": true,
+      "color": "sample",
+      "intensity": 1.2,
+      "range scale": 1,
+      "max lights": 0,
+      "fade in frames": 6,
+      "fade out frames": 10,
+      "only kinds": [],
+      "only areas": []
+    },
+    {
+      "key": "15448B118AF7FAC3",
+      "label": "orange flame animation frame (torch or candle, to confirm)",
+      "enabled": true,
+      "color": "sample",
+      "intensity": 1.2,
+      "range scale": 1,
+      "max lights": 0,
+      "fade in frames": 6,
+      "fade out frames": 10,
+      "only kinds": [],
+      "only areas": []
+    },
+    {
+      "key": "BE06968E165CB05D",
+      "label": "orange flame animation frame (torch or candle, to confirm)",
+      "enabled": true,
+      "color": "sample",
+      "intensity": 1.2,
+      "range scale": 1,
+      "max lights": 0,
+      "fade in frames": 6,
+      "fade out frames": 10,
+      "only kinds": [],
+      "only areas": []
+    },
+    {
+      "key": "041E3BF6C36A8FE9",
+      "label": "orange flame animation frame (torch or candle, to confirm)",
+      "enabled": true,
+      "color": "sample",
+      "intensity": 1.2,
+      "range scale": 1,
+      "max lights": 0,
+      "fade in frames": 6,
+      "fade out frames": 10,
+      "only kinds": [],
+      "only areas": []
+    },
+    {
+      "key": "986AB21A7AE83568",
+      "label": "orange flame animation frame (torch or candle, to confirm)",
+      "enabled": true,
+      "color": "sample",
+      "intensity": 1.2,
+      "range scale": 1,
+      "max lights": 0,
+      "fade in frames": 6,
+      "fade out frames": 10,
+      "only kinds": [],
+      "only areas": []
+    },
+    {
+      "key": "2659DCAFC2CB69B6",
+      "label": "orange flame animation frame (torch or candle, to confirm)",
+      "enabled": true,
+      "color": "sample",
+      "intensity": 1.2,
+      "range scale": 1,
+      "max lights": 0,
+      "fade in frames": 6,
+      "fade out frames": 10,
+      "only kinds": [],
+      "only areas": []
+    },
+    {
+      "key": "9D086CE8B7E845EC",
+      "label": "orange flame animation frame (torch or candle, to confirm)",
+      "enabled": true,
+      "color": "sample",
+      "intensity": 1.2,
+      "range scale": 1,
+      "max lights": 0,
+      "fade in frames": 6,
+      "fade out frames": 10,
+      "only kinds": [],
+      "only areas": []
+    },
+    {
+      "key": "3ECAC02DED9EA870",
+      "label": "orange flame animation frame (torch or candle, to confirm)",
+      "enabled": true,
+      "color": "sample",
+      "intensity": 1.2,
+      "range scale": 1,
+      "max lights": 0,
+      "fade in frames": 6,
+      "fade out frames": 10,
+      "only kinds": [],
+      "only areas": []
+    },
+    {
+      "key": "3C851392DD3757BB",
+      "label": "tiny lavender sparkle in the overworld (possibly a spirit): kept dark",
+      "enabled": false,
+      "color": "sample",
+      "intensity": 0.1,
+      "range scale": 0.3,
+      "max lights": 1,
+      "fade in frames": 0,
+      "fade out frames": 0,
+      "only kinds": [],
+      "only areas": []
+    },
+    {
+      "key": "C305A9A892EC9FE6",
+      "label": "tiny lavender sparkle in the overworld (possibly a spirit): kept dark",
+      "enabled": false,
+      "color": "sample",
+      "intensity": 0.1,
+      "range scale": 0.3,
+      "max lights": 1,
+      "fade in frames": 0,
+      "fade out frames": 0,
+      "only kinds": [],
+      "only areas": []
+    },
+    {
+      "key": "0E0E2319734AE9CA",
+      "label": "tiny lavender sparkle in the overworld (possibly a spirit): kept dark",
+      "enabled": false,
+      "color": "sample",
+      "intensity": 0.1,
+      "range scale": 0.3,
+      "max lights": 1,
+      "fade in frames": 0,
+      "fade out frames": 0,
+      "only kinds": [],
+      "only areas": []
+    },
+    {
+      "key": "0356BFA8F3897E44",
+      "label": "tiny lavender sparkle (possibly a spirit): kept dark",
+      "enabled": false,
+      "color": "sample",
+      "intensity": 0.1,
+      "range scale": 0.3,
+      "max lights": 1,
+      "fade in frames": 0,
+      "fade out frames": 0,
+      "only kinds": [],
+      "only areas": []
+    },
+    {
+      "key": "499502300FD2CD11",
+      "label": "tiny pink sparkle (possibly a spirit): kept dark",
+      "enabled": false,
+      "color": "sample",
+      "intensity": 0.1,
+      "range scale": 0.3,
+      "max lights": 1,
+      "fade in frames": 0,
+      "fade out frames": 0,
+      "only kinds": [],
+      "only areas": []
+    }
+  ],
+  "candidates": []
+}

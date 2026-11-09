@@ -1,3 +1,5 @@
+#include <algorithm>
+
 #include "recomp_ui.h"
 #include "recomp_input.h"
 #include "zelda_sound.h"
@@ -651,7 +653,28 @@ public:
         bind_option(constructor, "rr_option", &new_options.rr_option);
         bind_option(constructor, "tf_option", &new_options.tf_option);
         bind_option(constructor, "transparency_option", &new_options.transparency_option);
-        bind_option(constructor, "advanced_lighting_option", &new_options.advanced_lighting_option);
+        // The upscaler options only show while Ray Traced Lighting is on.
+        constructor.BindFunc("advanced_lighting_option",
+            [](Rml::Variant& out) { get_option(new_options.advanced_lighting_option, out); },
+            [](const Rml::Variant& in) {
+                set_option(new_options.advanced_lighting_option, in);
+                graphics_model_handle.DirtyVariable("options_changed");
+                graphics_model_handle.DirtyVariable("advanced_lighting_option");
+            }
+        );
+        bind_option(constructor, "second_bounce_option", &new_options.second_bounce_option);
+        bind_option(constructor, "advanced_water_option", &new_options.advanced_water_option);
+        bind_option(constructor, "rt_upscaler_option", &new_options.rt_upscaler_option);
+        bind_option(constructor, "rt_upscaler_quality_option", &new_options.rt_upscaler_quality_option);
+        constructor.BindFunc("rt_upscaler_sharpness",
+            [](Rml::Variant& out) {
+                out = new_options.rt_upscaler_sharpness;
+            },
+            [](const Rml::Variant& in) {
+                new_options.rt_upscaler_sharpness = std::clamp(in.Get<int>(), 0, 100);
+                graphics_model_handle.DirtyVariable("options_changed");
+                graphics_model_handle.DirtyVariable("rt_upscaler_sharpness");
+            });
         constructor.BindFunc("rr_manual_value",
             [](Rml::Variant& out) {
                 out = new_options.rr_manual_value;

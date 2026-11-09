@@ -1,7 +1,13 @@
 #include <algorithm>
+#include <atomic>
 #include <cmath>
 
 #include "quest64_lighting.h"
+
+namespace RT64 {
+    // Defined in rt64_raytracing_resources.cpp.
+    void rtDiagLog(const char *fmt, ...);
+}
 
 namespace {
     // Game variables. Despite the decomp names, gNextMap/gNextSubmap hold the loaded room.
@@ -23,6 +29,17 @@ namespace {
         return *reinterpret_cast<const int32_t*>(rdram + (address - 0x80000000u));
     }
 
+    float read_f32(const uint8_t* rdram, uint32_t address) {
+        return *reinterpret_cast<const float*>(rdram + (address - 0x80000000u));
+    }
+
+    // gPlayerPos (PlayerPos in the decomp's game.h): pos x, y, z at +0x00, rot at +0x0C, so the facing angle (rot.y,
+    // radians) is at +0x10.
+    constexpr uint32_t gPlayerPosX = 0x8007BACC;
+    constexpr uint32_t gPlayerFacing = 0x8007BADC;
+
+    std::atomic<bool> player_position_requested = false;
+
     enum class LightKind {
         Outdoor,  // Sun by day, moon by night. Yaw turns the sun's path, pitch is its highest elevation.
         Interior, // Houses, inns, ships. Fixed light from yaw/pitch.
@@ -39,70 +56,71 @@ namespace {
         LightKind kind;
         float yaw;
         float pitch;
+        const char* name;
     };
 
     constexpr RoomLight room_lights[] = {
-        { 0x00, -1, LightKind::Outdoor, 0.0f, 62.0f },   // Melrode
-        { 0x00, 2, LightKind::Mammon, -130.0f, 55.0f },  // Floating monastery / Mammon approach
-        { 0x00, 3, LightKind::Mammon, -130.0f, 55.0f },  // Ghost Melrode village
-        { 0x00, 4, LightKind::Mammon, -130.0f, 55.0f },  // Ghost monastery path
-        { 0x01, -1, LightKind::Outdoor, 0.0f, 62.0f },   // Dondoran
-        { 0x02, -1, LightKind::Outdoor, 0.0f, 62.0f },   // Holy Plain
-        { 0x03, -1, LightKind::Outdoor, 0.0f, 62.0f },   // Dondoran Flats
-        { 0x04, -1, LightKind::Outdoor, 0.0f, 62.0f },   // Larapool
-        { 0x05, -1, LightKind::Outdoor, 0.0f, 62.0f },   // West Carmagh
-        { 0x06, -1, LightKind::Outdoor, 0.0f, 62.0f },   // Normoon
-        { 0x07, -1, LightKind::Outdoor, 0.0f, 62.0f },   // East Limelin
-        { 0x08, -1, LightKind::Outdoor, 0.0f, 62.0f },   // Limelin
-        { 0x09, -1, LightKind::Outdoor, 0.0f, 70.0f },   // Dindom Dries
-        { 0x0A, -1, LightKind::Outdoor, 0.0f, 62.0f },   // Shamwood
-        { 0x0B, -1, LightKind::Outdoor, 0.0f, 55.0f },   // Brannoch / Baragoon Moor
-        { 0x0B, 3, LightKind::Cave, 20.0f, 72.0f },      // Post-Beigis passage
-        { 0x0B, 4, LightKind::Cave, 20.0f, 72.0f },
-        { 0x0B, 5, LightKind::Cave, 20.0f, 72.0f },
-        { 0x0B, 6, LightKind::Cave, 20.0f, 72.0f },
-        { 0x0B, 7, LightKind::Cave, 20.0f, 72.0f },
-        { 0x0C, -1, LightKind::Outdoor, 0.0f, 58.0f },   // Isle of Skye
-        { 0x0D, -1, LightKind::Interior, 35.0f, 58.0f }, // Melrode Monastery
-        { 0x0E, -1, LightKind::Castle, -30.0f, 62.0f },  // Dondoran Castle
-        { 0x0E, 13, LightKind::Mammon, -130.0f, 55.0f }, // Ghost room
-        { 0x0F, -1, LightKind::Interior, 35.0f, 58.0f }, // Melrode houses
-        { 0x0F, 13, LightKind::Mammon, -130.0f, 55.0f }, // Ghost house
-        { 0x10, -1, LightKind::Interior, 35.0f, 58.0f }, // Dondoran houses
-        { 0x11, -1, LightKind::Interior, 35.0f, 58.0f }, // Larapool houses
-        { 0x12, -1, LightKind::Interior, 35.0f, 58.0f }, // Larapool & West Carmagh houses
-        { 0x13, -1, LightKind::Interior, 35.0f, 66.0f }, // Normoon windmills
-        { 0x14, -1, LightKind::Interior, 35.0f, 58.0f }, // Normoon houses
-        { 0x15, -1, LightKind::Castle, -30.0f, 62.0f },  // Limelin Castle
-        { 0x16, -1, LightKind::Interior, 35.0f, 58.0f }, // Limelin houses
-        { 0x16, 24, LightKind::Mammon, -130.0f, 55.0f }, // Ghost house
-        { 0x16, 25, LightKind::Mammon, -130.0f, 55.0f }, // Ghost house cellar
-        { 0x17, -1, LightKind::Interior, 35.0f, 58.0f }, // Greenoch/Dindom/Brannoch houses
-        { 0x18, -1, LightKind::Castle, -30.0f, 62.0f },  // Shamwood palace
-        { 0x19, -1, LightKind::Interior, 35.0f, 58.0f }, // Skye houses, ships
-        { 0x19, 6, LightKind::Mammon, -130.0f, 55.0f },  // Ghost ship corridor
-        { 0x19, 7, LightKind::Mammon, -130.0f, 55.0f },  // Ghost ship hold
-        { 0x1A, -1, LightKind::Cave, 20.0f, 72.0f },     // Blue Cave
-        { 0x1A, 2, LightKind::Outdoor, 0.0f, 62.0f },    // Crystal Valley
-        { 0x1A, 3, LightKind::Interior, 35.0f, 58.0f },  // Epona's cottage
-        { 0x1A, 4, LightKind::Interior, 35.0f, 58.0f },  // Epona's cottage back room
-        { 0x1B, -1, LightKind::Cave, 20.0f, 72.0f },     // Cull Hazard
-        { 0x1C, -1, LightKind::Cave, 20.0f, 72.0f },     // Baragoon Tunnel
-        { 0x1D, -1, LightKind::Cave, 20.0f, 72.0f },     // Boil Hole
-        { 0x1E, -1, LightKind::Castle, -30.0f, 62.0f },  // Brannoch Castle
-        { 0x1F, -1, LightKind::Outdoor, 0.0f, 62.0f },   // Connor Forest
-        { 0x1F, 2, LightKind::Interior, 35.0f, 58.0f },  // Forest hut
-        { 0x20, -1, LightKind::Outdoor, 0.0f, 62.0f },   // Glencoe Forest
-        { 0x20, 1, LightKind::Interior, 35.0f, 58.0f },  // Glencoe cottage
-        { 0x20, 2, LightKind::Interior, 35.0f, 58.0f },  // Glencoe cottage back room
-        { 0x21, -1, LightKind::Outdoor, 0.0f, 62.0f },   // Windward Forest
-        { 0x21, 1, LightKind::Interior, 35.0f, 58.0f },  // Windward forest house
-        { 0x21, 2, LightKind::Interior, 35.0f, 58.0f },  // Windward forest house back room
-        { 0x22, -1, LightKind::Mammon, -130.0f, 55.0f }, // World of Mammon
-        { 0x23, -1, LightKind::Cave, 20.0f, 72.0f },     // Nepty's shrine
+        { 0x00, -1, LightKind::Outdoor, 0.0f, 62.0f, "Melrode" },
+        { 0x00, 2, LightKind::Mammon, -130.0f, 55.0f, "Floating monastery / Mammon approach" },
+        { 0x00, 3, LightKind::Mammon, -130.0f, 55.0f, "Ghost Melrode village" },
+        { 0x00, 4, LightKind::Mammon, -130.0f, 55.0f, "Ghost monastery path" },
+        { 0x01, -1, LightKind::Outdoor, 0.0f, 62.0f, "Dondoran" },
+        { 0x02, -1, LightKind::Outdoor, 0.0f, 62.0f, "Holy Plain" },
+        { 0x03, -1, LightKind::Outdoor, 0.0f, 62.0f, "Dondoran Flats" },
+        { 0x04, -1, LightKind::Outdoor, 0.0f, 62.0f, "Larapool" },
+        { 0x05, -1, LightKind::Outdoor, 0.0f, 62.0f, "West Carmagh" },
+        { 0x06, -1, LightKind::Outdoor, 0.0f, 62.0f, "Normoon" },
+        { 0x07, -1, LightKind::Outdoor, 0.0f, 62.0f, "East Limelin" },
+        { 0x08, -1, LightKind::Outdoor, 0.0f, 62.0f, "Limelin" },
+        { 0x09, -1, LightKind::Outdoor, 0.0f, 70.0f, "Dindom Dries" },
+        { 0x0A, -1, LightKind::Outdoor, 0.0f, 62.0f, "Shamwood" },
+        { 0x0B, -1, LightKind::Outdoor, 0.0f, 55.0f, "Brannoch / Baragoon Moor" },
+        { 0x0B, 3, LightKind::Cave, 20.0f, 72.0f, "Post-Beigis passage" },
+        { 0x0B, 4, LightKind::Cave, 20.0f, 72.0f, "Post-Beigis passage" },
+        { 0x0B, 5, LightKind::Cave, 20.0f, 72.0f, "Post-Beigis passage" },
+        { 0x0B, 6, LightKind::Cave, 20.0f, 72.0f, "Post-Beigis passage" },
+        { 0x0B, 7, LightKind::Cave, 20.0f, 72.0f, "Post-Beigis passage" },
+        { 0x0C, -1, LightKind::Outdoor, 0.0f, 58.0f, "Isle of Skye" },
+        { 0x0D, -1, LightKind::Interior, 35.0f, 58.0f, "Melrode Monastery" },
+        { 0x0E, -1, LightKind::Castle, -30.0f, 62.0f, "Dondoran Castle" },
+        { 0x0E, 13, LightKind::Mammon, -130.0f, 55.0f, "Ghost room" },
+        { 0x0F, -1, LightKind::Interior, 35.0f, 58.0f, "Melrode houses" },
+        { 0x0F, 13, LightKind::Mammon, -130.0f, 55.0f, "Ghost house" },
+        { 0x10, -1, LightKind::Interior, 35.0f, 58.0f, "Dondoran houses" },
+        { 0x11, -1, LightKind::Interior, 35.0f, 58.0f, "Larapool houses" },
+        { 0x12, -1, LightKind::Interior, 35.0f, 58.0f, "Larapool & West Carmagh houses" },
+        { 0x13, -1, LightKind::Interior, 35.0f, 66.0f, "Normoon windmills" },
+        { 0x14, -1, LightKind::Interior, 35.0f, 58.0f, "Normoon houses" },
+        { 0x15, -1, LightKind::Castle, -30.0f, 62.0f, "Limelin Castle" },
+        { 0x16, -1, LightKind::Interior, 35.0f, 58.0f, "Limelin houses" },
+        { 0x16, 24, LightKind::Mammon, -130.0f, 55.0f, "Ghost house" },
+        { 0x16, 25, LightKind::Mammon, -130.0f, 55.0f, "Ghost house cellar" },
+        { 0x17, -1, LightKind::Interior, 35.0f, 58.0f, "Greenoch/Dindom/Brannoch houses" },
+        { 0x18, -1, LightKind::Castle, -30.0f, 62.0f, "Shamwood palace" },
+        { 0x19, -1, LightKind::Interior, 35.0f, 58.0f, "Skye houses, ships" },
+        { 0x19, 6, LightKind::Mammon, -130.0f, 55.0f, "Ghost ship corridor" },
+        { 0x19, 7, LightKind::Mammon, -130.0f, 55.0f, "Ghost ship hold" },
+        { 0x1A, -1, LightKind::Cave, 20.0f, 72.0f, "Blue Cave" },
+        { 0x1A, 2, LightKind::Outdoor, 0.0f, 62.0f, "Crystal Valley" },
+        { 0x1A, 3, LightKind::Interior, 35.0f, 58.0f, "Epona's cottage" },
+        { 0x1A, 4, LightKind::Interior, 35.0f, 58.0f, "Epona's cottage back room" },
+        { 0x1B, -1, LightKind::Cave, 20.0f, 72.0f, "Cull Hazard" },
+        { 0x1C, -1, LightKind::Cave, 20.0f, 72.0f, "Baragoon Tunnel" },
+        { 0x1D, -1, LightKind::Cave, 20.0f, 72.0f, "Boil Hole" },
+        { 0x1E, -1, LightKind::Castle, -30.0f, 62.0f, "Brannoch Castle" },
+        { 0x1F, -1, LightKind::Outdoor, 0.0f, 62.0f, "Connor Forest" },
+        { 0x1F, 2, LightKind::Interior, 35.0f, 58.0f, "Forest hut" },
+        { 0x20, -1, LightKind::Outdoor, 0.0f, 62.0f, "Glencoe Forest" },
+        { 0x20, 1, LightKind::Interior, 35.0f, 58.0f, "Glencoe cottage" },
+        { 0x20, 2, LightKind::Interior, 35.0f, 58.0f, "Glencoe cottage back room" },
+        { 0x21, -1, LightKind::Outdoor, 0.0f, 62.0f, "Windward Forest" },
+        { 0x21, 1, LightKind::Interior, 35.0f, 58.0f, "Windward forest house" },
+        { 0x21, 2, LightKind::Interior, 35.0f, 58.0f, "Windward forest house back room" },
+        { 0x22, -1, LightKind::Mammon, -130.0f, 55.0f, "World of Mammon" },
+        { 0x23, -1, LightKind::Cave, 20.0f, 72.0f, "Nepty's shrine" },
     };
 
-    const RoomLight default_light = { -1, -1, LightKind::Interior, 35.0f, 58.0f };
+    const RoomLight default_light = { -1, -1, LightKind::Interior, 35.0f, 58.0f, "" };
 
     const RoomLight& find_room_light(int map, int room) {
         const RoomLight* map_light = nullptr;
@@ -185,6 +203,10 @@ namespace {
     }
 }
 
+void quest64::request_player_position_log() {
+    player_position_requested = true;
+}
+
 RT64::SceneLight quest64::scene_light_from_game(const uint8_t* rdram) {
     RT64::SceneLight light;
     if (rdram == nullptr) {
@@ -194,6 +216,15 @@ RT64::SceneLight quest64::scene_light_from_game(const uint8_t* rdram) {
     const int map = read_s32(rdram, gNextMap);
     const int room = read_s32(rdram, gNextSubmap);
     const RoomLight& room_light = find_room_light(map, room);
+    light.map = map;
+    light.room = room;
+    light.areaName = room_light.name;
+
+    // F8: where Brian stands, in the format Eltale Studio's Paste field reads, for placing manual lights.
+    if (player_position_requested.exchange(false)) {
+        RT64::rtDiagLog("player position: map %d room %d (%.2f, %.2f, %.2f) facing %.2f", map, room,
+            read_f32(rdram, gPlayerPosX), read_f32(rdram, gPlayerPosX + 4), read_f32(rdram, gPlayerPosX + 8), read_f32(rdram, gPlayerFacing));
+    }
 
     switch (room_light.kind) {
         case LightKind::Outdoor: {

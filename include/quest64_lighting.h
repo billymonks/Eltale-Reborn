@@ -8,6 +8,9 @@
 namespace quest64 {
     // Picks the advanced lighting sun, moon or indoor light for the room and time the game is in.
     RT64::SceneLight scene_light_from_game(const uint8_t* rdram);
+
+    // F8: the next frame logs Brian's map, room, position and facing to rt.log, for placing manual lights.
+    void request_player_position_log();
 }
 
 #endif

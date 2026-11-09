@@ -62,6 +62,10 @@
     height: 100%;
     border-radius: 0dp;
     text-align: left;
+
+    > .config__wrapper {
+        overflow-y: auto;
+    }
 }
 
 .config__header, .config__footer {

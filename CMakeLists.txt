@@ -278,12 +278,19 @@ if (WIN32)
         ${sdl2_SOURCE_DIR}/lib/x64
     )
 
-    # Copy SDL2 and dxc DLLs to output folder as post build step
+    # AMD FSR SDK v2.4.0 signed DLLs for the FSR 3.1 upscaler of the ray traced image, loaded only when it's selected.
+    set(FSR_SIGNED_BIN "${CMAKE_SOURCE_DIR}/lib/FidelityFX-SDK/Kits/FidelityFX/signedbin")
+    set(FSR_DLLS
+        "${FSR_SIGNED_BIN}/amd_fidelityfx_loader_dx12.dll"
+        "${FSR_SIGNED_BIN}/amd_fidelityfx_upscaler_dx12.dll")
+
+    # Copy SDL2, dxc and FSR DLLs to output folder as post build step
     add_custom_command(TARGET Quest64Recompiled POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
             "${sdl2_SOURCE_DIR}/lib/x64/SDL2.dll"
             "${CMAKE_SOURCE_DIR}/lib/rt64/src/contrib/dxc/bin/x64/dxil.dll"
             "${CMAKE_SOURCE_DIR}/lib/rt64/src/contrib/dxc/bin/x64/dxcompiler.dll"
+            ${FSR_DLLS}
             $<TARGET_FILE_DIR:Quest64Recompiled>)
 
     set_target_properties(
@@ -425,6 +432,7 @@ if (WIN32)
             "${sdl2_SOURCE_DIR}/lib/x64/SDL2.dll"
             "${CMAKE_SOURCE_DIR}/lib/rt64/src/contrib/dxc/bin/x64/dxil.dll"
             "${CMAKE_SOURCE_DIR}/lib/rt64/src/contrib/dxc/bin/x64/dxcompiler.dll"
+            ${FSR_DLLS}
             "${ELTALE_PLAYER_DIST}"
         COMMAND ${CMAKE_COMMAND} -E copy_directory
             "${CMAKE_SOURCE_DIR}/assets"
@@ -436,6 +444,9 @@ if (WIN32)
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
             "${CMAKE_SOURCE_DIR}/recompcontrollerdb.txt"
             "${ELTALE_PLAYER_DIST}"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${CMAKE_SOURCE_DIR}/lib/FidelityFX-SDK/LICENSE.md"
+            "${ELTALE_PLAYER_DIST}/AMD-FSR-SDK-LICENSE.md"
         COMMENT "Stage player files in dist/EltaleReborn-PC"
         VERBATIM
     )

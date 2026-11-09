@@ -759,6 +759,9 @@ scrollbarhorizontal sliderbar {
   border-radius: 0dp;
   text-align: left;
 }
+.config__hz-wrapper > .config__wrapper {
+  overflow-y: auto;
+}
 
 .config__header, .config__footer {
   display: flex;

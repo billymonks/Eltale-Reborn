@@ -21,6 +21,8 @@ build/
 *.dll
 *.lib
 *.pdb
+# The signed AMD FidelityFX runtime DLLs ship with the vendored SDK.
+!lib/FidelityFX-SDK/Kits/FidelityFX/signedbin/*.dll
 
 # Player folder staged by the Quest64Recompiled post-build step
 /dist/

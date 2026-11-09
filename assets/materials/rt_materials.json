@@ -1,0 +1,49 @@
+{
+  "_readme": [
+    "Shipped seed for the ray traced surface materials. The game copies these entries into",
+    "Documents\\Quest64Recompiled\\Ray Tracing\\rt_materials.json, adds its own guesses there, and reads it when it starts.",
+    "Entries here with source \"user\" replace guesses in that file; entries edited there with source \"user\" always win.",
+    "Keys are the texture hashes logged as 'material key' in the F9 capture.",
+    "class: matte, sprite, grass, dirt, wood, cloth, skin, stone, polished, metal or water.",
+    "roughness 0 (mirror) to 1 (matte); metalness 0 (plastic, stone) to 1 (metal); specular 0 (none) to 1 (full).",
+    "Advanced Water Rendering shades large flat surfaces with class water (blended or opaque), plus water it detects: flat, wide",
+    "alpha blended layers without depth writes, and flat, wide opaque surfaces whose texture scrolls (blue or blue-green pixels only).",
+    "For water, specular is the reflectivity (1 = full Fresnel) and roughness the sharpness of the sun glint (0.05 to 0.1).",
+    "A user entry with another class stops a texture from being treated as water."
+  ],
+  "materials": {
+    "316A612C6A2F87CD": {
+      "label": "water: the sea by Limelin (opaque, path traced)",
+      "class": "water",
+      "roughness": 0.06,
+      "metalness": 0.0,
+      "specular": 1.0,
+      "source": "user",
+      "on": "sea surface (opaque, depth writing)",
+      "first seen": "East Limelin (map 07, room 0)",
+      "map": 7,
+      "room": 0
+    },
+    "8449FE90B241427A": {
+      "label": "water: Larapool fountain basin",
+      "class": "water",
+      "roughness": 0.06,
+      "metalness": 0.0,
+      "specular": 1.0,
+      "source": "user",
+      "on": "water surface (alpha blended, no depth write)",
+      "first seen": "Larapool (map 04, room 0)",
+      "map": 4,
+      "room": 0
+    },
+    "4106543E220B7E95": {
+      "label": "battle circle (flat and blended, but not water)",
+      "class": "sprite",
+      "roughness": 0.9,
+      "metalness": 0.0,
+      "specular": 0.0,
+      "source": "user",
+      "on": "battle ring on the ground"
+    }
+  }
+}

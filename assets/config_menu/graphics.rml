@@ -329,7 +329,7 @@
                                 data-checked="advanced_lighting_option"
                                 value="Off"
                                 id="lighting_off"
-                                style="nav-up: #transparency_smooth; nav-down: #apply_button"
+                                style="nav-up: #transparency_smooth; nav-down: #bounce_off"
                             />
                             <label class="config-option__tab-label" for="lighting_off">Off</label>
                             <input type="radio"
@@ -339,9 +339,173 @@
                                 data-checked="advanced_lighting_option"
                                 value="On"
                                 id="lighting_on"
-                                style="nav-up: #transparency_flicker; nav-down: #apply_button"
+                                style="nav-up: #transparency_flicker; nav-down: #bounce_on"
                             />
                             <label class="config-option__tab-label" for="lighting_on">On</label>
+                        </div>
+                    </div>
+
+                    <div class="config-option" data-event-mouseover="set_cur_config_index(10)">
+                        <label class="config-option__title">Second Light Bounce</label>
+                        <div class="config-option__list">
+                            <input type="radio"
+                                data-event-blur="set_cur_config_index(-1)"
+                                data-event-focus="set_cur_config_index(10)"
+                                name="secondbounce"
+                                data-checked="second_bounce_option"
+                                value="Off"
+                                id="bounce_off"
+                                style="nav-up: #lighting_off; nav-down: #water_off"
+                            />
+                            <label class="config-option__tab-label" for="bounce_off">Off</label>
+                            <input type="radio"
+                                data-event-blur="set_cur_config_index(-1)"
+                                data-event-focus="set_cur_config_index(10)"
+                                name="secondbounce"
+                                data-checked="second_bounce_option"
+                                value="On"
+                                id="bounce_on"
+                                style="nav-up: #lighting_on; nav-down: #water_on"
+                            />
+                            <label class="config-option__tab-label" for="bounce_on">On</label>
+                        </div>
+                    </div>
+
+                    <div class="config-option" data-event-mouseover="set_cur_config_index(11)">
+                        <label class="config-option__title">Advanced Water Rendering</label>
+                        <div class="config-option__list">
+                            <input type="radio"
+                                data-event-blur="set_cur_config_index(-1)"
+                                data-event-focus="set_cur_config_index(11)"
+                                name="advancedwater"
+                                data-checked="advanced_water_option"
+                                value="Off"
+                                id="water_off"
+                                style="nav-up: #bounce_off; nav-down: #apply_button"
+                                data-style-nav-down="advanced_lighting_option == 'On' ? '#upscaler_off' : '#apply_button'"
+                            />
+                            <label class="config-option__tab-label" for="water_off">Off</label>
+                            <input type="radio"
+                                data-event-blur="set_cur_config_index(-1)"
+                                data-event-focus="set_cur_config_index(11)"
+                                name="advancedwater"
+                                data-checked="advanced_water_option"
+                                value="On"
+                                id="water_on"
+                                style="nav-up: #bounce_on; nav-down: #apply_button"
+                                data-style-nav-down="advanced_lighting_option == 'On' ? '#upscaler_fsr1' : '#apply_button'"
+                            />
+                            <label class="config-option__tab-label" for="water_on">On</label>
+                        </div>
+                    </div>
+
+                    <div class="config-option" data-if="advanced_lighting_option == 'On'" data-event-mouseover="set_cur_config_index(12)">
+                        <label class="config-option__title">Upscaler</label>
+                        <div class="config-option__list">
+                            <input type="radio"
+                                data-event-blur="set_cur_config_index(-1)"
+                                data-event-focus="set_cur_config_index(12)"
+                                name="rtupscaler"
+                                data-checked="rt_upscaler_option"
+                                value="Off"
+                                id="upscaler_off"
+                                style="nav-up: #water_off; nav-down: #quality_native"
+                            />
+                            <label class="config-option__tab-label" for="upscaler_off">Off</label>
+                            <input type="radio"
+                                data-event-blur="set_cur_config_index(-1)"
+                                data-event-focus="set_cur_config_index(12)"
+                                name="rtupscaler"
+                                data-checked="rt_upscaler_option"
+                                value="FSR1"
+                                id="upscaler_fsr1"
+                                style="nav-up: #water_on; nav-down: #quality_quality"
+                            />
+                            <label class="config-option__tab-label" for="upscaler_fsr1">FSR 1</label>
+                            <input type="radio"
+                                data-event-blur="set_cur_config_index(-1)"
+                                data-event-focus="set_cur_config_index(12)"
+                                name="rtupscaler"
+                                data-checked="rt_upscaler_option"
+                                value="FSR3"
+                                id="upscaler_fsr3"
+                                style="nav-up: #water_on; nav-down: #quality_balanced"
+                            />
+                            <label class="config-option__tab-label" for="upscaler_fsr3">FSR 3</label>
+                        </div>
+                    </div>
+
+                    <div class="config-option" data-if="advanced_lighting_option == 'On'" data-event-mouseover="set_cur_config_index(13)">
+                        <label class="config-option__title">Upscaler Quality</label>
+                        <div class="config-option__list">
+                            <input type="radio"
+                                data-event-blur="set_cur_config_index(-1)"
+                                data-event-focus="set_cur_config_index(13)"
+                                name="rtupscalerquality"
+                                data-checked="rt_upscaler_quality_option"
+                                value="NativeAA"
+                                id="quality_native"
+                                style="nav-up: #upscaler_off; nav-down: #sharpness_input"
+                            />
+                            <label class="config-option__tab-label" for="quality_native">Native AA</label>
+                            <input type="radio"
+                                data-event-blur="set_cur_config_index(-1)"
+                                data-event-focus="set_cur_config_index(13)"
+                                name="rtupscalerquality"
+                                data-checked="rt_upscaler_quality_option"
+                                value="Quality"
+                                id="quality_quality"
+                                style="nav-up: #upscaler_fsr1; nav-down: #sharpness_input"
+                            />
+                            <label class="config-option__tab-label" for="quality_quality">Quality</label>
+                            <input type="radio"
+                                data-event-blur="set_cur_config_index(-1)"
+                                data-event-focus="set_cur_config_index(13)"
+                                name="rtupscalerquality"
+                                data-checked="rt_upscaler_quality_option"
+                                value="Balanced"
+                                id="quality_balanced"
+                                style="nav-up: #upscaler_fsr3; nav-down: #sharpness_input"
+                            />
+                            <label class="config-option__tab-label" for="quality_balanced">Balanced</label>
+                            <input type="radio"
+                                data-event-blur="set_cur_config_index(-1)"
+                                data-event-focus="set_cur_config_index(13)"
+                                name="rtupscalerquality"
+                                data-checked="rt_upscaler_quality_option"
+                                value="Performance"
+                                id="quality_performance"
+                                style="nav-up: #upscaler_fsr3; nav-down: #sharpness_input"
+                            />
+                            <label class="config-option__tab-label" for="quality_performance">Performance</label>
+                            <input type="radio"
+                                data-event-blur="set_cur_config_index(-1)"
+                                data-event-focus="set_cur_config_index(13)"
+                                name="rtupscalerquality"
+                                data-checked="rt_upscaler_quality_option"
+                                value="UltraPerformance"
+                                id="quality_ultra"
+                                style="nav-up: #upscaler_fsr3; nav-down: #sharpness_input"
+                            />
+                            <label class="config-option__tab-label" for="quality_ultra">Ultra Perf.</label>
+                        </div>
+                    </div>
+
+                    <div class="config-option" data-if="advanced_lighting_option == 'On'" data-event-mouseover="set_cur_config_index(14)">
+                        <label class="config-option__title">Upscaler Sharpness</label>
+                        <div class="config-option__range-wrapper config-option__list">
+                            <label class="config-option__range-label">{{rt_upscaler_sharpness}}%</label>
+                            <input
+                                data-event-blur="set_cur_config_index(-1)"
+                                data-event-focus="set_cur_config_index(14)"
+                                class="nav-vert"
+                                id="sharpness_input"
+                                type="range"
+                                min="0"
+                                max="100"
+                                style="flex: 1; margin: 0dp; nav-up: #quality_native; nav-down: #apply_button;"
+                                data-value="rt_upscaler_sharpness"
+                            />
                         </div>
                     </div>
 
@@ -389,6 +553,21 @@
                     <p data-if="cur_config_index == 9">
                         <b>Early, broken and experimental.</b> Expect glitches: shadows can lose resolution or disappear in large areas. Places one directional light in each 3D scene and draws its shadow onto the geometry. Flat oval shadows under characters are hidden while this is on. The HUD stays as the game drew it. This costs performance. <b>Off</b> keeps the original lighting.
                     </p>
+                    <p data-if="cur_config_index == 10">
+                        With <b>Ray Traced Lighting</b> on, light bounces off two surfaces instead of one before reaching shaded areas, so rooms lit by lamps and glowing objects look fuller and corners pick up color from nearby walls. This costs extra GPU time each frame. <b>Off</b> uses a single bounce. You can also press <b>Shift + F10</b> to toggle it while playing.
+                    </p>
+                    <p data-if="cur_config_index == 11">
+                        Only works with <b>Ray Traced Lighting</b> on. Lakes, the sea and fountains reflect the scenery and sky, more strongly at low angles, catch a rippling glint from the sun, take shadows, and turn clearer in the shallows at the shore. The water keeps its own color, scrolling texture and see-through look. This costs some GPU time where water is on screen. <b>Off</b> draws the water as the game does.
+                    </p>
+                    <p data-if="cur_config_index == 12">
+                        Ray traces the lighting at a lower resolution and scales it up to the screen, which makes <b>Ray Traced Lighting</b> much cheaper. The sky, the HUD and effects drawn over the scene stay at full resolution. <b>FSR 1</b> scales each frame on its own and works on any GPU. <b>FSR 3</b> combines several frames for a sharper, steadier image; it needs Direct3D 12 and falls back to <b>FSR 1</b> if it can't start. <b>Off</b> ray traces every pixel.
+                    </p>
+                    <p data-if="cur_config_index == 13">
+                        How much smaller the ray traced image is. <b>Native AA</b> keeps the full resolution and only smooths edges. <b>Quality</b> renders 67% of the width and height, <b>Balanced</b> 59%, <b>Performance</b> 50% and <b>Ultra Perf.</b> 33%. Lower settings are faster and blurrier. Only used when an <b>Upscaler</b> is on.
+                    </p>
+                    <p data-if="cur_config_index == 14">
+                        Sharpens the upscaled image to bring back detail. <b>0%</b> doesn't sharpen. Too much can make edges look harsh. Only used when an <b>Upscaler</b> is on.
+                    </p>
                 </div>
             </div>
             <div class="config__footer">
@@ -401,7 +580,8 @@
                         data-attrif-disabled="!options_changed"
                         onclick="apply_options"
                         id="apply_button"
-                        style="nav-up:#lighting_off"
+                        style="nav-up:#water_off"
+                        data-style-nav-up="advanced_lighting_option == 'On' ? '#sharpness_input' : '#water_off'"
                     >
                         <div class="button__label">Apply<span class="prompt-font-sm">{{gfx_help__apply}}</span></div>
                     </button>

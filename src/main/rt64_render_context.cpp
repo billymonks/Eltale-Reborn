@@ -23,6 +23,14 @@ static RT64::UserConfiguration::Antialiasing device_max_msaa = RT64::UserConfigu
 static bool sample_positions_supported = false;
 static bool high_precision_fb_enabled = false;
 
+namespace RT64 {
+    // Defined in rt64_raytracing_resources.cpp.
+    void setRaytracingIndirectBounces(uint32_t bounces);
+    void setRaytracingAdvancedWater(bool enabled);
+    // Defined in rt64_raytracing_upscale.cpp.
+    void setRaytracingUpscaler(uint32_t mode, uint32_t quality, float sharpness);
+}
+
 static uint8_t DMEM[0x1000];
 static uint8_t IMEM[0x1000];
 
@@ -281,6 +289,10 @@ void set_application_user_config(RT64::Application* application, const ultramode
     application->userConfig.textureFiltering = config.tf_option != ultramodern::renderer::TextureFiltering::Off;
     application->userConfig.smoothTransparency = config.transparency_option == ultramodern::renderer::TransparencyMode::Smooth;
     application->userConfig.advancedLighting = config.advanced_lighting_option == ultramodern::renderer::AdvancedLighting::On;
+    RT64::setRaytracingIndirectBounces((config.second_bounce_option == ultramodern::renderer::SecondBounce::On) ? 2 : 1);
+    RT64::setRaytracingAdvancedWater(config.advanced_water_option == ultramodern::renderer::AdvancedWater::On);
+    // The enum values match RT64::RaytracingUpscaler (Off, FSR 1, FSR 3) and the quality index of setRaytracingUpscaler.
+    RT64::setRaytracingUpscaler(uint32_t(config.rt_upscaler_option), uint32_t(config.rt_upscaler_quality_option), float(std::clamp(config.rt_upscaler_sharpness, 0, 100)) / 100.0f);
     recomp_smooth_transparency = application->userConfig.smoothTransparency;
     application->userConfig.displayBuffering = RT64::UserConfiguration::DisplayBuffering::Triple;
 }
