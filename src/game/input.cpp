@@ -14,7 +14,6 @@ namespace RT64 {
     // Defined in rt64_raytracing_resources.cpp.
     void requestRaytracingDiagnosticsCapture();
     void cycleRaytracingDebugView();
-    void toggleRaytracingSecondBounce();
 }
 
 namespace quest64 {
@@ -23,6 +22,9 @@ namespace quest64 {
 }
 
 constexpr float axis_threshold = 0.5f;
+
+// F10 cycles the ray tracing debug views (RT64::cycleRaytracingDebugView). Off for players; set to true to bring it back.
+constexpr bool kEnableRtDebugHotkeys = false;
 
 struct ControllerState {
     SDL_GameController* controller;
@@ -228,15 +230,9 @@ bool sdl_event_filter(void* userdata, SDL_Event* event) {
                 // Logs Brian's map, room, position and facing to rt.log, for placing manual lights in Eltale Studio.
                 quest64::request_player_position_log();
             }
-            if (keyevent->keysym.scancode == SDL_Scancode::SDL_SCANCODE_F10) {
-                if ((keyevent->keysym.mod & KMOD_SHIFT) != 0) {
-                    // Toggles the second light bounce of the indirect light; logged to rt.log.
-                    RT64::toggleRaytracingSecondBounce();
-                }
-                else {
-                    // Cycles the ray tracing debug views (normals, sun visibility, draw ids); logged to rt.log.
-                    RT64::cycleRaytracingDebugView();
-                }
+            if (kEnableRtDebugHotkeys && (keyevent->keysym.scancode == SDL_Scancode::SDL_SCANCODE_F10) && ((keyevent->keysym.mod & KMOD_SHIFT) == 0)) {
+                // Cycles the ray tracing debug views (normals, sun visibility, draw ids); logged to rt.log.
+                RT64::cycleRaytracingDebugView();
             }
             if (scanning_device != recomp::InputDevice::COUNT) {
                 if (keyevent->keysym.scancode == SDL_Scancode::SDL_SCANCODE_ESCAPE) {

@@ -662,7 +662,6 @@ public:
                 graphics_model_handle.DirtyVariable("advanced_lighting_option");
             }
         );
-        bind_option(constructor, "second_bounce_option", &new_options.second_bounce_option);
         bind_option(constructor, "advanced_water_option", &new_options.advanced_water_option);
         bind_option(constructor, "rt_upscaler_option", &new_options.rt_upscaler_option);
         bind_option(constructor, "rt_upscaler_quality_option", &new_options.rt_upscaler_quality_option);

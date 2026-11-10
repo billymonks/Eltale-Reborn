@@ -289,7 +289,8 @@ void set_application_user_config(RT64::Application* application, const ultramode
     application->userConfig.textureFiltering = config.tf_option != ultramodern::renderer::TextureFiltering::Off;
     application->userConfig.smoothTransparency = config.transparency_option == ultramodern::renderer::TransparencyMode::Smooth;
     application->userConfig.advancedLighting = config.advanced_lighting_option == ultramodern::renderer::AdvancedLighting::On;
-    RT64::setRaytracingIndirectBounces((config.second_bounce_option == ultramodern::renderer::SecondBounce::On) ? 2 : 1);
+    // The second light bounce isn't offered: always one bounce, whatever graphics.json says.
+    RT64::setRaytracingIndirectBounces(1);
     RT64::setRaytracingAdvancedWater(config.advanced_water_option == ultramodern::renderer::AdvancedWater::On);
     // The enum values match RT64::RaytracingUpscaler (Off, FSR 1, FSR 3) and the quality index of setRaytracingUpscaler.
     RT64::setRaytracingUpscaler(uint32_t(config.rt_upscaler_option), uint32_t(config.rt_upscaler_quality_option), float(std::clamp(config.rt_upscaler_sharpness, 0, 100)) / 100.0f);
