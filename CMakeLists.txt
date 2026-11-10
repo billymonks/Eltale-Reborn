@@ -410,6 +410,17 @@ build_pixel_shader(Quest64Recompiled "shaders/InterfacePS.hlsl" "shaders/Interfa
 
 target_sources(Quest64Recompiled PRIVATE ${SOURCES})
 
+# The shipped ray tracing configuration is also compiled into the game, so every build runs with the materials,
+# emitters and lights it was built with, whatever the folder it's run from (see rt64_render_context.cpp).
+foreach(RT_CONFIG rt_materials rt_emitters rt_lights)
+    add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/rt_config/${RT_CONFIG}_json.c ${CMAKE_CURRENT_BINARY_DIR}/rt_config/${RT_CONFIG}_json.h
+        COMMAND file_to_c ${CMAKE_SOURCE_DIR}/assets/materials/${RT_CONFIG}.json ${RT_CONFIG}_json ${CMAKE_CURRENT_BINARY_DIR}/rt_config/${RT_CONFIG}_json.c ${CMAKE_CURRENT_BINARY_DIR}/rt_config/${RT_CONFIG}_json.h
+        DEPENDS ${CMAKE_SOURCE_DIR}/assets/materials/${RT_CONFIG}.json file_to_c
+    )
+    target_sources(Quest64Recompiled PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/rt_config/${RT_CONFIG}_json.c)
+endforeach()
+target_include_directories(Quest64Recompiled PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/rt_config)
+
 # Ship mods/*.nrm next to the executable. The game scans that folder on launch.
 # They are not compiled into the binary, so replacing an .nrm does not relink the game.
 add_custom_command(TARGET Quest64Recompiled POST_BUILD

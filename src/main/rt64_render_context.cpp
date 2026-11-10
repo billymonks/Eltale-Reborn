@@ -31,7 +31,14 @@ namespace RT64 {
     void setRaytracingUpscaler(uint32_t mode, uint32_t quality, float sharpness);
     // Defined in rt64_raytracing_denoise.cpp.
     void setRaytracingLightQuality(uint32_t samples, uint32_t denoiser, uint32_t accumulation);
+    // Defined in rt64_raytracing_materials.cpp.
+    void setRaytracingShippedConfig(const char *fileName, const char *data, size_t size);
 }
+
+// assets/materials/*.json, compiled in by CMakeLists.txt.
+#include "rt_materials_json.h"
+#include "rt_emitters_json.h"
+#include "rt_lights_json.h"
 
 static uint8_t DMEM[0x1000];
 static uint8_t IMEM[0x1000];
@@ -341,6 +348,10 @@ ultramodern::renderer::GraphicsApi map_graphics_api(RT64::UserConfiguration::Gra
 zelda64::renderer::RT64Context::RT64Context(uint8_t* rdram, ultramodern::renderer::WindowHandle window_handle, bool debug) {
     static unsigned char dummy_rom_header[0x40];
     recompui::set_render_hooks();
+
+    RT64::setRaytracingShippedConfig("rt_materials.json", rt_materials_json, rt_materials_json_size);
+    RT64::setRaytracingShippedConfig("rt_emitters.json", rt_emitters_json, rt_emitters_json_size);
+    RT64::setRaytracingShippedConfig("rt_lights.json", rt_lights_json, rt_lights_json_size);
 
     // Set up the RT64 application core fields.
     RT64::Application::Core appCore{};
