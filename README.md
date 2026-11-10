@@ -22,6 +22,8 @@ On the main menu, give it the US Quest 64 ROM. Another file format of that same 
 
 Graphics, audio, controls, and mods are in the in-game menus, with a mouse, a keyboard, or a controller. It runs at the monitor's refresh rate unless you set the framerate slider in the graphics menu. The framerate does not change gameplay. Widescreen and ultrawide both work, and the HUD can stay at 16:9 on an ultrawide display. Very wide aspect ratios can show animation quirks at the edge of some cutscenes. An external framerate cap, such as the one in the NVIDIA control panel, can stutter; use the in-game slider instead.
 
+Path traced lighting (optional, needs a GPU with hardware ray tracing) adds bounced light, ray traced shadows and reflections, and glowing light sources. The Light Samples, Denoiser and Light Accumulation settings trade performance for image quality, and AMD FSR 3 upscaling (FSR 1 as a fallback) boosts performance.
+
 Texture packs install the same way as mods. [RT64's texture pack notes](https://github.com/rt64/rt64/blob/main/TEXTURE-PACKS.md) describe the format.
 
 MSI Afterburner, Wallpaper Engine, and similar overlays can keep the game from rendering. Turn them off if the picture breaks.
@@ -58,6 +60,6 @@ The port is forked from [Quest 64: Recompiled](https://github.com/Rainchus/Quest
 
 Eltale Reborn: Holy Magic Century and Quest 64: Modern Gameplay mods are created by Billy Monks.
 
-Also used: [RmlUi](https://github.com/mikke89/RmlUi), [lunasvg](https://github.com/sammycage/lunasvg), and [FreeType](https://freetype.org/) for the menus; [moodycamel::ConcurrentQueue](https://github.com/cameron314/concurrentqueue); [Gamepad Motion Helpers](https://github.com/JibbSmart/GamepadMotionHelpers); [Ares](https://github.com/ares-emulator/ares) for the RSP vector instruction references; and [Quest 64 Tale: Recompiled](https://github.com/boricuapab/quest64tale-recompiled) by boricuapab (GPL-3.0) inspired some of the fixes.
+Also used: [RmlUi](https://github.com/mikke89/RmlUi), [lunasvg](https://github.com/sammycage/lunasvg), and [FreeType](https://freetype.org/) for the menus; [AMD FidelityFX SDK](https://github.com/GPUOpen-LibrariesAndSDKs/FidelityFX-SDK) (FSR 3 and FSR 1) for upscaling; [moodycamel::ConcurrentQueue](https://github.com/cameron314/concurrentqueue); [Gamepad Motion Helpers](https://github.com/JibbSmart/GamepadMotionHelpers); [Ares](https://github.com/ares-emulator/ares) for the RSP vector instruction references; and [Quest 64 Tale: Recompiled](https://github.com/boricuapab/quest64tale-recompiled) by boricuapab (GPL-3.0) inspired some of the fixes.
 
 Thanks to [ZeldaRET](https://github.com/zeldaret), [decompals](https://github.com/decompals), [Wiseguy](https://github.com/Mr-Wiseguy), and [DarioSamo](https://github.com/DarioSamo).
