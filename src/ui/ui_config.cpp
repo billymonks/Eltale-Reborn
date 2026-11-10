@@ -665,6 +665,9 @@ public:
         bind_option(constructor, "advanced_water_option", &new_options.advanced_water_option);
         bind_option(constructor, "rt_upscaler_option", &new_options.rt_upscaler_option);
         bind_option(constructor, "rt_upscaler_quality_option", &new_options.rt_upscaler_quality_option);
+        bind_option(constructor, "rt_light_samples_option", &new_options.rt_light_samples_option);
+        bind_option(constructor, "rt_denoiser_option", &new_options.rt_denoiser_option);
+        bind_option(constructor, "rt_accumulation_option", &new_options.rt_accumulation_option);
         constructor.BindFunc("rt_upscaler_sharpness",
             [](Rml::Variant& out) {
                 out = new_options.rt_upscaler_sharpness;

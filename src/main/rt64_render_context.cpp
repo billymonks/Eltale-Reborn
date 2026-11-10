@@ -29,6 +29,8 @@ namespace RT64 {
     void setRaytracingAdvancedWater(bool enabled);
     // Defined in rt64_raytracing_upscale.cpp.
     void setRaytracingUpscaler(uint32_t mode, uint32_t quality, float sharpness);
+    // Defined in rt64_raytracing_denoise.cpp.
+    void setRaytracingLightQuality(uint32_t samples, uint32_t denoiser, uint32_t accumulation);
 }
 
 static uint8_t DMEM[0x1000];
@@ -294,6 +296,8 @@ void set_application_user_config(RT64::Application* application, const ultramode
     RT64::setRaytracingAdvancedWater(config.advanced_water_option == ultramodern::renderer::AdvancedWater::On);
     // The enum values match RT64::RaytracingUpscaler (Off, FSR 1, FSR 3) and the quality index of setRaytracingUpscaler.
     RT64::setRaytracingUpscaler(uint32_t(config.rt_upscaler_option), uint32_t(config.rt_upscaler_quality_option), float(std::clamp(config.rt_upscaler_sharpness, 0, 100)) / 100.0f);
+    // The enum values are the level indices of setRaytracingLightQuality (samples 0 = 1, 1 = 2, 2 = 4 rays).
+    RT64::setRaytracingLightQuality(uint32_t(config.rt_light_samples_option), uint32_t(config.rt_denoiser_option), uint32_t(config.rt_accumulation_option));
     recomp_smooth_transparency = application->userConfig.smoothTransparency;
     application->userConfig.displayBuffering = RT64::UserConfiguration::DisplayBuffering::Triple;
 }

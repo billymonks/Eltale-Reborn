@@ -356,7 +356,7 @@
                                 value="Off"
                                 id="water_off"
                                 style="nav-up: #lighting_off; nav-down: #apply_button"
-                                data-style-nav-down="advanced_lighting_option == 'On' ? '#upscaler_off' : '#apply_button'"
+                                data-style-nav-down="advanced_lighting_option == 'On' ? '#samples_one' : '#apply_button'"
                             />
                             <label class="config-option__tab-label" for="water_off">Off</label>
                             <input type="radio"
@@ -367,9 +367,117 @@
                                 value="On"
                                 id="water_on"
                                 style="nav-up: #lighting_on; nav-down: #apply_button"
-                                data-style-nav-down="advanced_lighting_option == 'On' ? '#upscaler_fsr1' : '#apply_button'"
+                                data-style-nav-down="advanced_lighting_option == 'On' ? '#samples_two' : '#apply_button'"
                             />
                             <label class="config-option__tab-label" for="water_on">On</label>
+                        </div>
+                    </div>
+
+                    <div class="config-option" data-if="advanced_lighting_option == 'On'" data-event-mouseover="set_cur_config_index(15)">
+                        <label class="config-option__title">Light Samples</label>
+                        <div class="config-option__list">
+                            <input type="radio"
+                                data-event-blur="set_cur_config_index(-1)"
+                                data-event-focus="set_cur_config_index(15)"
+                                name="rtlightsamples"
+                                data-checked="rt_light_samples_option"
+                                value="One"
+                                id="samples_one"
+                                style="nav-up: #water_off; nav-down: #denoiser_off"
+                            />
+                            <label class="config-option__tab-label" for="samples_one">1x</label>
+                            <input type="radio"
+                                data-event-blur="set_cur_config_index(-1)"
+                                data-event-focus="set_cur_config_index(15)"
+                                name="rtlightsamples"
+                                data-checked="rt_light_samples_option"
+                                value="Two"
+                                id="samples_two"
+                                style="nav-up: #water_on; nav-down: #denoiser_low"
+                            />
+                            <label class="config-option__tab-label" for="samples_two">2x</label>
+                            <input type="radio"
+                                data-event-blur="set_cur_config_index(-1)"
+                                data-event-focus="set_cur_config_index(15)"
+                                name="rtlightsamples"
+                                data-checked="rt_light_samples_option"
+                                value="Four"
+                                id="samples_four"
+                                style="nav-up: #water_on; nav-down: #denoiser_high"
+                            />
+                            <label class="config-option__tab-label" for="samples_four">4x</label>
+                        </div>
+                    </div>
+
+                    <div class="config-option" data-if="advanced_lighting_option == 'On'" data-event-mouseover="set_cur_config_index(16)">
+                        <label class="config-option__title">Denoiser</label>
+                        <div class="config-option__list">
+                            <input type="radio"
+                                data-event-blur="set_cur_config_index(-1)"
+                                data-event-focus="set_cur_config_index(16)"
+                                name="rtdenoiser"
+                                data-checked="rt_denoiser_option"
+                                value="Off"
+                                id="denoiser_off"
+                                style="nav-up: #samples_one; nav-down: #accumulation_responsive"
+                            />
+                            <label class="config-option__tab-label" for="denoiser_off">Off</label>
+                            <input type="radio"
+                                data-event-blur="set_cur_config_index(-1)"
+                                data-event-focus="set_cur_config_index(16)"
+                                name="rtdenoiser"
+                                data-checked="rt_denoiser_option"
+                                value="Low"
+                                id="denoiser_low"
+                                style="nav-up: #samples_two; nav-down: #accumulation_balanced"
+                            />
+                            <label class="config-option__tab-label" for="denoiser_low">Low</label>
+                            <input type="radio"
+                                data-event-blur="set_cur_config_index(-1)"
+                                data-event-focus="set_cur_config_index(16)"
+                                name="rtdenoiser"
+                                data-checked="rt_denoiser_option"
+                                value="High"
+                                id="denoiser_high"
+                                style="nav-up: #samples_four; nav-down: #accumulation_stable"
+                            />
+                            <label class="config-option__tab-label" for="denoiser_high">High</label>
+                        </div>
+                    </div>
+
+                    <div class="config-option" data-if="advanced_lighting_option == 'On'" data-event-mouseover="set_cur_config_index(17)">
+                        <label class="config-option__title">Light Accumulation</label>
+                        <div class="config-option__list">
+                            <input type="radio"
+                                data-event-blur="set_cur_config_index(-1)"
+                                data-event-focus="set_cur_config_index(17)"
+                                name="rtaccumulation"
+                                data-checked="rt_accumulation_option"
+                                value="Responsive"
+                                id="accumulation_responsive"
+                                style="nav-up: #denoiser_off; nav-down: #upscaler_off"
+                            />
+                            <label class="config-option__tab-label" for="accumulation_responsive">Responsive</label>
+                            <input type="radio"
+                                data-event-blur="set_cur_config_index(-1)"
+                                data-event-focus="set_cur_config_index(17)"
+                                name="rtaccumulation"
+                                data-checked="rt_accumulation_option"
+                                value="Balanced"
+                                id="accumulation_balanced"
+                                style="nav-up: #denoiser_low; nav-down: #upscaler_fsr1"
+                            />
+                            <label class="config-option__tab-label" for="accumulation_balanced">Balanced</label>
+                            <input type="radio"
+                                data-event-blur="set_cur_config_index(-1)"
+                                data-event-focus="set_cur_config_index(17)"
+                                name="rtaccumulation"
+                                data-checked="rt_accumulation_option"
+                                value="Stable"
+                                id="accumulation_stable"
+                                style="nav-up: #denoiser_high; nav-down: #upscaler_fsr3"
+                            />
+                            <label class="config-option__tab-label" for="accumulation_stable">Stable</label>
                         </div>
                     </div>
 
@@ -383,7 +491,7 @@
                                 data-checked="rt_upscaler_option"
                                 value="Off"
                                 id="upscaler_off"
-                                style="nav-up: #water_off; nav-down: #quality_native"
+                                style="nav-up: #accumulation_responsive; nav-down: #quality_native"
                             />
                             <label class="config-option__tab-label" for="upscaler_off">Off</label>
                             <input type="radio"
@@ -393,7 +501,7 @@
                                 data-checked="rt_upscaler_option"
                                 value="FSR1"
                                 id="upscaler_fsr1"
-                                style="nav-up: #water_on; nav-down: #quality_quality"
+                                style="nav-up: #accumulation_balanced; nav-down: #quality_quality"
                             />
                             <label class="config-option__tab-label" for="upscaler_fsr1">FSR 1</label>
                             <input type="radio"
@@ -403,7 +511,7 @@
                                 data-checked="rt_upscaler_option"
                                 value="FSR3"
                                 id="upscaler_fsr3"
-                                style="nav-up: #water_on; nav-down: #quality_balanced"
+                                style="nav-up: #accumulation_stable; nav-down: #quality_balanced"
                             />
                             <label class="config-option__tab-label" for="upscaler_fsr3">FSR 3</label>
                         </div>
@@ -529,6 +637,15 @@
                     </p>
                     <p data-if="cur_config_index == 11">
                         Modern water with reflections, waves and sun glints. Requires Ray Traced Lighting.
+                    </p>
+                    <p data-if="cur_config_index == 15">
+                        Higher settings cast more rays and look cleaner, especially when moving. Each step doubles the cost of the lighting.
+                    </p>
+                    <p data-if="cur_config_index == 16">
+                        Smooths out grain in the lighting while keeping edges sharp. The biggest improvement when moving, at a small cost.
+                    </p>
+                    <p data-if="cur_config_index == 17">
+                        How many frames are blended to remove grain. <b>Stable</b> is cleanest when still. <b>Responsive</b> reacts fastest with the least trailing.
                     </p>
                     <p data-if="cur_config_index == 12">
                         Renders at a lower resolution and upscales with AMD FSR for better performance. Requires Ray Traced Lighting.

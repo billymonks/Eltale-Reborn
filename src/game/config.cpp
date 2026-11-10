@@ -42,6 +42,9 @@ constexpr auto advanced_water_default = ultramodern::renderer::AdvancedWater::On
 constexpr auto rt_upscaler_default    = ultramodern::renderer::RtUpscaler::Off;
 constexpr auto rt_upscaler_quality_default = ultramodern::renderer::RtUpscalerQuality::Quality;
 constexpr int rt_upscaler_sharpness_default = 50;
+constexpr auto rt_light_samples_default = ultramodern::renderer::RtLightSamples::One;
+constexpr auto rt_denoiser_default    = ultramodern::renderer::RtDenoiser::Low;
+constexpr auto rt_accumulation_default = ultramodern::renderer::RtAccumulation::Balanced;
 constexpr int ds_default              = 1;
 constexpr int rr_manual_default       = 60;
 constexpr bool developer_mode_default = true;
@@ -120,6 +123,9 @@ namespace ultramodern {
             {"rt_upscaler_option", config.rt_upscaler_option},
             {"rt_upscaler_quality_option", config.rt_upscaler_quality_option},
             {"rt_upscaler_sharpness", config.rt_upscaler_sharpness},
+            {"rt_light_samples_option", config.rt_light_samples_option},
+            {"rt_denoiser_option", config.rt_denoiser_option},
+            {"rt_accumulation_option", config.rt_accumulation_option},
             {"rr_manual_value", config.rr_manual_value},
             {"developer_mode",  config.developer_mode},
         };
@@ -143,6 +149,9 @@ namespace ultramodern {
         config.rt_upscaler_option = from_or_default(j, "rt_upscaler_option", rt_upscaler_default);
         config.rt_upscaler_quality_option = from_or_default(j, "rt_upscaler_quality_option", rt_upscaler_quality_default);
         config.rt_upscaler_sharpness = std::clamp(from_or_default(j, "rt_upscaler_sharpness", rt_upscaler_sharpness_default), 0, 100);
+        config.rt_light_samples_option = from_or_default(j, "rt_light_samples_option", rt_light_samples_default);
+        config.rt_denoiser_option = from_or_default(j, "rt_denoiser_option", rt_denoiser_default);
+        config.rt_accumulation_option = from_or_default(j, "rt_accumulation_option", rt_accumulation_default);
         recomp_smooth_transparency = config.transparency_option == renderer::TransparencyMode::Smooth;
         config.rr_manual_value  = from_or_default(j, "rr_manual_value", rr_manual_default);
         config.developer_mode   = from_or_default(j, "developer_mode",  developer_mode_default);
@@ -387,6 +396,9 @@ void reset_graphics_options() {
     new_config.rt_upscaler_option = rt_upscaler_default;
     new_config.rt_upscaler_quality_option = rt_upscaler_quality_default;
     new_config.rt_upscaler_sharpness = rt_upscaler_sharpness_default;
+    new_config.rt_light_samples_option = rt_light_samples_default;
+    new_config.rt_denoiser_option = rt_denoiser_default;
+    new_config.rt_accumulation_option = rt_accumulation_default;
     recomp_smooth_transparency = 1;
     new_config.rr_manual_value = rr_manual_default;
     new_config.developer_mode = developer_mode_default;
