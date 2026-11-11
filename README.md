@@ -24,12 +24,6 @@ Graphics, audio, controls, and mods are in the in-game menus, with a mouse, a ke
 
 Path traced lighting (optional, needs a GPU with hardware ray tracing) adds bounced light, ray traced shadows and reflections, and glowing light sources. The Light Samples, Denoiser and Light Accumulation settings trade performance for image quality, and AMD FSR 3 upscaling (FSR 1 as a fallback) boosts performance.
 
-Texture packs install the same way as mods. [RT64's texture pack notes](https://github.com/rt64/rt64/blob/main/TEXTURE-PACKS.md) describe the format.
-
-MSI Afterburner, Wallpaper Engine, and similar overlays can keep the game from rendering. Turn them off if the picture breaks.
-
-You need a GPU with Direct3D 12 (shader model 6), Vulkan 1.2, or Metal argument buffers tier 2. On x86-64 the CPU needs SSE4.1. A crash at startup is often an old graphics driver.
-
 ## Controls
 
 Reset to defaults in the controls menu restores a Dreamcast pad: A on the bottom, B on the right, Y on the top, X on the left. Adapters that report the triggers as shoulder buttons get the same bindings.
