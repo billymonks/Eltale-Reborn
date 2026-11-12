@@ -81,6 +81,12 @@ namespace zelda64 {
     AimInvertMode get_analog_camera_invert_mode();
     void set_analog_camera_invert_mode(AimInvertMode mode);
 
+    // Inverting the camera stick: turning (left / right) and tilting (up / down). Off by default.
+    AimInvertMode get_camera_invert_turn_mode();
+    void set_camera_invert_turn_mode(AimInvertMode mode);
+    AimInvertMode get_camera_invert_tilt_mode();
+    void set_camera_invert_tilt_mode(AimInvertMode mode);
+
     enum class AnalogCamMode {
         On,
         Off,

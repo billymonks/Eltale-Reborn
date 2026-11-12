@@ -34,6 +34,16 @@ before_vram = 0x80024260
 
 # Rumble follows a sound effect as it actually starts. Delay 0 plays here ($a0 the id,
 # $a3 the scaled volume). A delayed effect waits in func_80026658 and starts with $a0 the id.
+# The menu page actions (the controls page's Previous / Next page, LB / RB by default). Every Start menu page turns
+# on N64 Z (previous) or R (next) held, so while the Start menu is up those actions add Z / R to the controller word
+# here: func_800314C0 has just loaded it into $v1 (lhu at 0x80031524), and the held, newly pressed and previous-frame
+# words it then stores all follow from it. The function is identical to Eltale Monsters' controller read, the only
+# code that reads the pad.
+[[patches.hook]]
+func = "func_800314C0"
+text = "unsigned int recomp_menu_page_buttons(unsigned char* rdram, unsigned int buttons); ctx->r3 = recomp_menu_page_buttons(rdram, (unsigned int)(ctx->r3 & 0xFFFF));"
+before_vram = 0x80031528
+
 [[patches.hook]]
 func = "func_800268D4"
 text = "void recomp_sfx_rumble(unsigned char* rdram, int id, int volume); recomp_sfx_rumble(rdram, (int)(ctx->r4 & 255), (int)(ctx->r7 & 255));"

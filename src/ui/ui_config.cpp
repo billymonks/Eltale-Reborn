@@ -12,6 +12,8 @@
 #include "ultramodern/ultramodern.hpp"
 #include "RmlUi/Core.h"
 
+#include <functional>
+
 #include "core/ui_context.h"
 
 ultramodern::renderer::GraphicsConfig new_options;
@@ -243,6 +245,10 @@ struct ControlOptionsContext {
     zelda64::RadioBoxMode radio_comm_box_mode;
     zelda64::AimInvertMode invert_y_axis_mode;
     zelda64::AimInvertMode analog_camera_invert_mode;
+    int camera_turn_speed; // percent, 100 = the tuned speed
+    int camera_tilt_speed;
+    zelda64::AimInvertMode camera_invert_turn_mode;
+    zelda64::AimInvertMode camera_invert_tilt_mode;
 };
 
 ControlOptionsContext control_options_context;
@@ -374,6 +380,50 @@ void zelda64::set_analog_camera_invert_mode(zelda64::AimInvertMode mode) {
     }
 }
 
+int recomp::get_camera_turn_speed() {
+    return control_options_context.camera_turn_speed;
+}
+
+int recomp::get_camera_tilt_speed() {
+    return control_options_context.camera_tilt_speed;
+}
+
+void recomp::set_camera_turn_speed(int speed) {
+    control_options_context.camera_turn_speed = speed;
+    if (general_model_handle) {
+        general_model_handle.DirtyVariable("camera_turn_speed");
+    }
+}
+
+void recomp::set_camera_tilt_speed(int speed) {
+    control_options_context.camera_tilt_speed = speed;
+    if (general_model_handle) {
+        general_model_handle.DirtyVariable("camera_tilt_speed");
+    }
+}
+
+zelda64::AimInvertMode zelda64::get_camera_invert_turn_mode() {
+    return control_options_context.camera_invert_turn_mode;
+}
+
+void zelda64::set_camera_invert_turn_mode(zelda64::AimInvertMode mode) {
+    control_options_context.camera_invert_turn_mode = mode;
+    if (general_model_handle) {
+        general_model_handle.DirtyVariable("camera_invert_turn_mode");
+    }
+}
+
+zelda64::AimInvertMode zelda64::get_camera_invert_tilt_mode() {
+    return control_options_context.camera_invert_tilt_mode;
+}
+
+void zelda64::set_camera_invert_tilt_mode(zelda64::AimInvertMode mode) {
+    control_options_context.camera_invert_tilt_mode = mode;
+    if (general_model_handle) {
+        general_model_handle.DirtyVariable("camera_invert_tilt_mode");
+    }
+}
+
 struct SoundOptionsContext {
     std::atomic<int> main_volume; // Option to control the volume of all sound
     std::atomic<int> bgm_volume;
@@ -487,6 +537,199 @@ struct DebugContext {
 };
 
 DebugContext debug_context;
+
+// ---- The Controls page's picture: a modern pad, each control labelled with what it does ----
+// A reverse lookup of the controller's bindings: for each physical control (by SDL's positions: A south, B east, X
+// west, Y north), the actions bound to it, laid out like Steam's controller pages: the shoulder and menu buttons beside
+// a drawing of the pad, the sticks, D-pad and face buttons in sections under it. It hangs off the page's "inputs"
+// variable (inputs.pad), which the page refreshes after every change of a binding and of the highlighted row.
+struct PadLine {
+    Rml::String text;                       // (a struct, not a bare string: the debug page registers vector<string>)
+};
+
+struct PadRow {
+    Rml::String glyph;                      // the control's prompt-font glyph, or a short name
+    bool glyph_is_text = false;             // the glyph is a name (a paddle, Share), not a prompt-font glyph
+    Rml::Vector<PadLine> lines;             // the actions bound to it, one a line; empty: nothing
+    bool lit = false;                       // bound to the highlighted row
+};
+
+// The controls on the drawing, lit when bound to the highlighted row.
+struct PadSpots {
+    bool lt = false, lb = false, rt = false, rb = false, view = false, menu = false;
+    bool ls = false, l3 = false, rs = false, r3 = false;
+    bool dpad_up = false, dpad_down = false, dpad_left = false, dpad_right = false;
+    bool a = false, b = false, x = false, y = false;
+};
+
+struct PadView {
+    Rml::Vector<PadRow> left, right;                            // beside the drawing
+    Rml::Vector<PadRow> left_stick, dpad, right_stick, face;    // the sections under it
+    PadSpots spots;
+};
+
+static PadView pad_view;
+static Rml::VariableDefinition* pad_view_definition = nullptr;
+static size_t pad_view_signature = 0;
+
+// Whether an input belongs on the picture: the current controls style's (Classic: N64 L and Z, no camera actions;
+// Modern: the reverse), but not the PC menu's own Accept and Apply, which only work in that menu.
+static bool pad_lists_input(recomp::GameInput input) {
+    if (input == recomp::GameInput::ACCEPT_MENU || input == recomp::GameInput::APPLY_MENU) {
+        return false;
+    }
+    return recomp::is_input_used_by_style(input, recomp::get_controls_style());
+}
+
+// The listed inputs bound to one control on the controller (either binding slot), in the controls page's order.
+static Rml::Vector<recomp::GameInput> pad_inputs_on(const recomp::InputField& field) {
+    Rml::Vector<recomp::GameInput> out;
+    for (size_t i = 0; i < recomp::get_num_inputs(); i++) {
+        recomp::GameInput input = static_cast<recomp::GameInput>(i);
+        if (!pad_lists_input(input)) {
+            continue;
+        }
+        for (size_t slot = 0; slot < recomp::bindings_per_input; slot++) {
+            if (recomp::get_input_binding(input, slot, recomp::InputDevice::Controller) == field) {
+                out.push_back(input);
+                break;
+            }
+        }
+    }
+    return out;
+}
+
+static bool pad_has_focused(const Rml::Vector<recomp::GameInput>& inputs) {
+    for (recomp::GameInput input : inputs) {
+        if (static_cast<int>(input) == focused_input_index) {
+            return true;
+        }
+    }
+    return false;
+}
+
+static PadRow pad_row(const recomp::InputField& field, const char* name = nullptr) {
+    PadRow row;
+    row.glyph = name ? Rml::String{name} : field.to_string();
+    row.glyph_is_text = name != nullptr;
+    Rml::Vector<recomp::GameInput> inputs = pad_inputs_on(field);
+    for (recomp::GameInput input : inputs) {
+        row.lines.push_back(PadLine{recomp::get_input_name(input)});
+    }
+    row.lit = pad_has_focused(inputs);
+    return row;
+}
+
+// An extra button (paddles, Share, the touchpad, Home): listed only when something is bound to it.
+static void pad_extra(Rml::Vector<PadRow>& out, int sdl_button, const char* name) {
+    PadRow row = pad_row(recomp::controller_button_field(sdl_button), name);
+    if (!row.lines.empty()) {
+        out.push_back(std::move(row));
+    }
+}
+
+// A stick's section: one row when its four directions hold exactly one action's four (Move, Camera), else a row a
+// direction; then its click. Up is SDL's negative Y.
+static void pad_stick(Rml::Vector<PadRow>& out, int axis_x, int axis_y, int click_button, const char* stick_glyph,
+                      bool& spot, bool& click_spot) {
+    recomp::InputField up = recomp::controller_axis_field(axis_y, false);
+    recomp::InputField down = recomp::controller_axis_field(axis_y, true);
+    recomp::InputField left = recomp::controller_axis_field(axis_x, false);
+    recomp::InputField right = recomp::controller_axis_field(axis_x, true);
+    auto only = [](const recomp::InputField& field, recomp::GameInput input) {
+        Rml::Vector<recomp::GameInput> inputs = pad_inputs_on(field);
+        return inputs.size() == 1 && inputs[0] == input;
+    };
+    using GI = recomp::GameInput;
+    const char* whole = nullptr;
+    bool unbound = pad_inputs_on(up).empty() && pad_inputs_on(down).empty() && pad_inputs_on(left).empty() &&
+                   pad_inputs_on(right).empty();
+    if (unbound) {
+        // Nothing on the stick (Classic controls' right stick): one row, "--".
+        PadRow row;
+        row.glyph = stick_glyph;
+        out.push_back(std::move(row));
+        spot = false;
+    } else if (only(up, GI::Y_AXIS_POS) && only(down, GI::Y_AXIS_NEG) && only(left, GI::X_AXIS_NEG) && only(right, GI::X_AXIS_POS)) {
+        whole = "Move";
+    } else if (only(up, GI::CAMERA_UP) && only(down, GI::CAMERA_DOWN) && only(left, GI::CAMERA_LEFT) && only(right, GI::CAMERA_RIGHT)) {
+        whole = "Camera";
+    }
+    if (whole != nullptr) {
+        PadRow row;
+        row.glyph = stick_glyph;
+        row.lines.push_back(PadLine{whole});
+        for (const recomp::InputField& field : {up, down, left, right}) {
+            row.lit = row.lit || pad_has_focused(pad_inputs_on(field));
+        }
+        spot = row.lit;
+        out.push_back(std::move(row));
+    } else if (!unbound) {
+        for (const recomp::InputField& field : {up, down, left, right}) {
+            out.push_back(pad_row(field));
+            spot = spot || out.back().lit;
+        }
+    }
+    PadRow click = pad_row(recomp::controller_button_field(click_button));
+    click_spot = click.lit;
+    if (!unbound || !click.lines.empty()) {     // a stick with nothing on it at all is the one "--" row
+        out.push_back(std::move(click));
+    }
+}
+
+static void pad_build() {
+    PadView view;
+    PadSpots& s = view.spots;
+    auto add = [](Rml::Vector<PadRow>& rows, PadRow row, bool& spot) {
+        spot = row.lit;
+        rows.push_back(std::move(row));
+    };
+    add(view.left, pad_row(recomp::controller_axis_field(SDL_CONTROLLER_AXIS_TRIGGERLEFT, true)), s.lt);
+    add(view.left, pad_row(recomp::controller_button_field(SDL_CONTROLLER_BUTTON_LEFTSHOULDER)), s.lb);
+    add(view.left, pad_row(recomp::controller_button_field(SDL_CONTROLLER_BUTTON_BACK)), s.view);
+    pad_extra(view.left, SDL_CONTROLLER_BUTTON_PADDLE2, "L4");
+    pad_extra(view.left, SDL_CONTROLLER_BUTTON_PADDLE4, "L5");
+    pad_extra(view.left, SDL_CONTROLLER_BUTTON_MISC1, "Share");
+    add(view.right, pad_row(recomp::controller_axis_field(SDL_CONTROLLER_AXIS_TRIGGERRIGHT, true)), s.rt);
+    add(view.right, pad_row(recomp::controller_button_field(SDL_CONTROLLER_BUTTON_RIGHTSHOULDER)), s.rb);
+    add(view.right, pad_row(recomp::controller_button_field(SDL_CONTROLLER_BUTTON_START)), s.menu);
+    pad_extra(view.right, SDL_CONTROLLER_BUTTON_PADDLE1, "R4");
+    pad_extra(view.right, SDL_CONTROLLER_BUTTON_PADDLE3, "R5");
+    pad_extra(view.right, SDL_CONTROLLER_BUTTON_TOUCHPAD, nullptr);
+    pad_extra(view.right, SDL_CONTROLLER_BUTTON_GUIDE, nullptr);
+    pad_stick(view.left_stick, SDL_CONTROLLER_AXIS_LEFTX, SDL_CONTROLLER_AXIS_LEFTY, SDL_CONTROLLER_BUTTON_LEFTSTICK,
+              PF_ANALOG_L, s.ls, s.l3);
+    // Up, left, down, right: the spells' order in the list (Fire, Earth, Water, Wind).
+    add(view.dpad, pad_row(recomp::controller_button_field(SDL_CONTROLLER_BUTTON_DPAD_UP)), s.dpad_up);
+    add(view.dpad, pad_row(recomp::controller_button_field(SDL_CONTROLLER_BUTTON_DPAD_LEFT)), s.dpad_left);
+    add(view.dpad, pad_row(recomp::controller_button_field(SDL_CONTROLLER_BUTTON_DPAD_DOWN)), s.dpad_down);
+    add(view.dpad, pad_row(recomp::controller_button_field(SDL_CONTROLLER_BUTTON_DPAD_RIGHT)), s.dpad_right);
+    pad_stick(view.right_stick, SDL_CONTROLLER_AXIS_RIGHTX, SDL_CONTROLLER_AXIS_RIGHTY, SDL_CONTROLLER_BUTTON_RIGHTSTICK,
+              PF_ANALOG_R, s.rs, s.r3);
+    add(view.face, pad_row(recomp::controller_button_field(SDL_CONTROLLER_BUTTON_A)), s.a);
+    add(view.face, pad_row(recomp::controller_button_field(SDL_CONTROLLER_BUTTON_B)), s.b);
+    add(view.face, pad_row(recomp::controller_button_field(SDL_CONTROLLER_BUTTON_X)), s.x);
+    add(view.face, pad_row(recomp::controller_button_field(SDL_CONTROLLER_BUTTON_Y)), s.y);
+    pad_view = std::move(view);
+}
+
+// The pad view, rebuilt only when the controller's bindings or the highlighted row changed (RmlUi resolves
+// inputs.pad once per view it updates).
+static PadView* pad_get() {
+    size_t sig = std::hash<int>{}(focused_input_index) * 31 + static_cast<size_t>(recomp::get_controls_style());
+    for (size_t i = 0; i < recomp::get_num_inputs(); i++) {
+        for (size_t slot = 0; slot < recomp::bindings_per_input; slot++) {
+            const recomp::InputField& f = recomp::get_input_binding(static_cast<recomp::GameInput>(i), slot, recomp::InputDevice::Controller);
+            sig = sig * 31 + f.input_type;
+            sig = sig * 31 + static_cast<uint32_t>(f.input_id);
+        }
+    }
+    if (sig != pad_view_signature || pad_view.face.empty()) {
+        pad_view_signature = sig;
+        pad_build();
+    }
+    return &pad_view;
+}
 
 recompui::ContextId config_context;
 
@@ -785,6 +1028,38 @@ public:
             return Rml::Variant{recomp::get_input_name(static_cast<recomp::GameInput>(inputs.at(0).Get<size_t>()))};
         });
 
+        // The controls style (Modern / Classic): each has its own bindings, so switching changes every row.
+        constructor.BindFunc("controls_style", [](Rml::Variant& out) { get_option(recomp::get_controls_style(), out); });
+        constructor.BindEventCallback("set_controls_style",
+            [](Rml::DataModelHandle model_handle, Rml::Event& event, const Rml::VariantList& inputs) {
+                recomp::ControlsStyle style = recomp::get_controls_style();
+                set_option(style, inputs.at(0));
+                recomp::set_controls_style(style);
+                focused_input_index = -1;
+                model_handle.DirtyVariable("controls_style");
+                model_handle.DirtyVariable("inputs");
+                model_handle.DirtyVariable("cur_input_row");
+            });
+
+        // Whether the controls page lists an input: the current style's inputs, not the hidden N64 D-pad, and not the PC
+        // menu's own inputs for the keyboard. The style and the device are passed only so the rows update with them.
+        constructor.RegisterTransformFunc("input_row_visible", [](const Rml::VariantList& inputs) {
+            recomp::GameInput input = static_cast<recomp::GameInput>(inputs.at(0).Get<size_t>());
+            switch (input) {
+                case recomp::GameInput::DPAD_UP:
+                case recomp::GameInput::DPAD_DOWN:
+                case recomp::GameInput::DPAD_LEFT:
+                case recomp::GameInput::DPAD_RIGHT:
+                    return Rml::Variant{false};
+                case recomp::GameInput::TOGGLE_MENU:
+                case recomp::GameInput::ACCEPT_MENU:
+                case recomp::GameInput::APPLY_MENU:
+                    return Rml::Variant{cur_device != recomp::InputDevice::Keyboard};
+                default:
+                    return Rml::Variant{recomp::is_input_used_by_style(input, recomp::get_controls_style())};
+            }
+        });
+
         constructor.RegisterTransformFunc("get_input_enum_name", [](const Rml::VariantList& inputs) {
             return Rml::Variant{recomp::get_input_enum_name(static_cast<recomp::GameInput>(inputs.at(0).Get<size_t>()))};
         });
@@ -839,6 +1114,7 @@ public:
                 }
                 focused_input_index = input_index;
                 model_handle.DirtyVariable("cur_input_row");
+                model_handle.DirtyVariable("inputs");   // the picture lights the highlighted row's controls (inputs.pad)
             });
 
         // Rml variable definition for an individual InputField.
@@ -895,6 +1171,9 @@ public:
                 if (address.name == "array") {
                     return Rml::DataVariable(&binding_array_var_instance, nullptr);
                 }
+                else if (address.name == "pad") {
+                    return Rml::DataVariable(pad_view_definition, pad_get());
+                }
                 else {
                     recomp::GameInput input = recomp::get_input_from_enum_name(address.name);
                     if (input != recomp::GameInput::COUNT) {
@@ -904,6 +1183,49 @@ public:
                 return Rml::DataVariable{};
             }
         };
+
+        // The picture's pad view (PadView), reached as inputs.pad so that it updates with the bindings.
+        if (auto line_handle = constructor.RegisterStruct<PadLine>()) {
+            line_handle.RegisterMember("text", &PadLine::text);
+        }
+        constructor.RegisterArray<Rml::Vector<PadLine>>();
+        if (auto row_handle = constructor.RegisterStruct<PadRow>()) {
+            row_handle.RegisterMember("glyph", &PadRow::glyph);
+            row_handle.RegisterMember("glyph_is_text", &PadRow::glyph_is_text);
+            row_handle.RegisterMember("lines", &PadRow::lines);
+            row_handle.RegisterMember("lit", &PadRow::lit);
+        }
+        constructor.RegisterArray<Rml::Vector<PadRow>>();
+        if (auto spots_handle = constructor.RegisterStruct<PadSpots>()) {
+            spots_handle.RegisterMember("lt", &PadSpots::lt);
+            spots_handle.RegisterMember("lb", &PadSpots::lb);
+            spots_handle.RegisterMember("rt", &PadSpots::rt);
+            spots_handle.RegisterMember("rb", &PadSpots::rb);
+            spots_handle.RegisterMember("view", &PadSpots::view);
+            spots_handle.RegisterMember("menu", &PadSpots::menu);
+            spots_handle.RegisterMember("ls", &PadSpots::ls);
+            spots_handle.RegisterMember("l3", &PadSpots::l3);
+            spots_handle.RegisterMember("rs", &PadSpots::rs);
+            spots_handle.RegisterMember("r3", &PadSpots::r3);
+            spots_handle.RegisterMember("dpad_up", &PadSpots::dpad_up);
+            spots_handle.RegisterMember("dpad_down", &PadSpots::dpad_down);
+            spots_handle.RegisterMember("dpad_left", &PadSpots::dpad_left);
+            spots_handle.RegisterMember("dpad_right", &PadSpots::dpad_right);
+            spots_handle.RegisterMember("a", &PadSpots::a);
+            spots_handle.RegisterMember("b", &PadSpots::b);
+            spots_handle.RegisterMember("x", &PadSpots::x);
+            spots_handle.RegisterMember("y", &PadSpots::y);
+        }
+        if (auto view_handle = constructor.RegisterStruct<PadView>()) {
+            view_handle.RegisterMember("left", &PadView::left);
+            view_handle.RegisterMember("right", &PadView::right);
+            view_handle.RegisterMember("left_stick", &PadView::left_stick);
+            view_handle.RegisterMember("dpad", &PadView::dpad);
+            view_handle.RegisterMember("right_stick", &PadView::right_stick);
+            view_handle.RegisterMember("face", &PadView::face);
+            view_handle.RegisterMember("spots", &PadView::spots);
+        }
+        pad_view_definition = constructor.GetDataTypeRegister()->GetDefinition<PadView>();
 
         // Dummy type to associate with the variable definition.
         struct InputContainer {};
@@ -992,6 +1314,10 @@ public:
         bind_option(constructor, "radio_comm_box_mode", &control_options_context.radio_comm_box_mode);
         bind_option(constructor, "invert_y_axis_mode", &control_options_context.invert_y_axis_mode);
         bind_option(constructor, "analog_camera_invert_mode", &control_options_context.analog_camera_invert_mode);
+        constructor.Bind("camera_turn_speed", &control_options_context.camera_turn_speed);
+        constructor.Bind("camera_tilt_speed", &control_options_context.camera_tilt_speed);
+        bind_option(constructor, "camera_invert_turn_mode", &control_options_context.camera_invert_turn_mode);
+        bind_option(constructor, "camera_invert_tilt_mode", &control_options_context.camera_invert_tilt_mode);
 
         general_model_handle = constructor.GetModelHandle();
     }

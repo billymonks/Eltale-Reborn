@@ -646,6 +646,9 @@ int main(int argc, char** argv) {
     REGISTER_FUNC(recomp_get_invert_y_axis_mode);
     REGISTER_FUNC(recomp_get_radio_comm_box_mode);
     REGISTER_FUNC(recomp_get_camera_inputs);
+    REGISTER_FUNC(recomp_get_action_input);
+    REGISTER_FUNC(recomp_get_camera_speed);
+    REGISTER_FUNC(recomp_get_controls_style);
     REGISTER_FUNC(recomp_get_targeting_mode);
     REGISTER_FUNC(recomp_get_bgm_volume);
     REGISTER_FUNC(recomp_get_low_health_beeps_enabled);

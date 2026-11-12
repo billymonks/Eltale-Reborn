@@ -289,6 +289,10 @@ bool save_general_config(const std::filesystem::path& path) {
     config_json["radio_comm_box_mode"] = zelda64::get_radio_comm_box_mode();
     config_json["invert_y_axis_mode"] = zelda64::get_invert_y_axis_mode();
     config_json["analog_camera_invert_mode"] = zelda64::get_analog_camera_invert_mode();
+    config_json["camera_turn_speed"] = recomp::get_camera_turn_speed();
+    config_json["camera_tilt_speed"] = recomp::get_camera_tilt_speed();
+    config_json["camera_invert_turn_mode"] = zelda64::get_camera_invert_turn_mode();
+    config_json["camera_invert_tilt_mode"] = zelda64::get_camera_invert_tilt_mode();
     config_json["debug_mode"] = zelda64::get_debug_mode_enabled();
 
     return save_json_with_backups(path, config_json);
@@ -306,6 +310,10 @@ void set_general_settings_from_json(const nlohmann::json& config_json) {
     zelda64::set_radio_comm_box_mode(from_or_default(config_json, "radio_comm_box_mode", zelda64::RadioBoxMode::Original));
     zelda64::set_invert_y_axis_mode(from_or_default(config_json, "invert_y_axis_mode", zelda64::AimInvertMode::On));
     zelda64::set_analog_camera_invert_mode(from_or_default(config_json, "analog_camera_invert_mode", zelda64::AimInvertMode::On));
+    recomp::set_camera_turn_speed(from_or_default(config_json, "camera_turn_speed", 100));
+    recomp::set_camera_tilt_speed(from_or_default(config_json, "camera_tilt_speed", 100));
+    zelda64::set_camera_invert_turn_mode(from_or_default(config_json, "camera_invert_turn_mode", zelda64::AimInvertMode::Off));
+    zelda64::set_camera_invert_tilt_mode(from_or_default(config_json, "camera_invert_tilt_mode", zelda64::AimInvertMode::Off));
     zelda64::set_debug_mode_enabled(from_or_default(config_json, "debug_mode", false));
 }
 
@@ -319,74 +327,52 @@ bool load_general_config(const std::filesystem::path& path) {
     return true;
 }
 
-void assign_mapping(recomp::InputDevice device, recomp::GameInput input, const std::vector<recomp::InputField>& value) {
-    for (size_t binding_index = 0; binding_index < std::min(value.size(), recomp::bindings_per_input); binding_index++) {
-        recomp::set_input_binding(input, binding_index, device, value[binding_index]);
-    }
-};
-
 // same as assign_mapping, except will clear unassigned bindings if not in value
-void assign_mapping_complete(recomp::InputDevice device, recomp::GameInput input, const std::vector<recomp::InputField>& value) {
+void assign_mapping_complete(recomp::InputDevice device, recomp::ControlsStyle style, recomp::GameInput input, const std::vector<recomp::InputField>& value) {
     for (size_t binding_index = 0; binding_index < recomp::bindings_per_input; binding_index++) {
         if (binding_index >= value.size()) {
-            recomp::set_input_binding(input, binding_index, device, recomp::InputField{});
+            recomp::set_input_binding(input, binding_index, device, style, recomp::InputField{});
         } else {
-            recomp::set_input_binding(input, binding_index, device, value[binding_index]);
+            recomp::set_input_binding(input, binding_index, device, style, value[binding_index]);
         }
     }
 };
 
-void assign_all_mappings(recomp::InputDevice device, const recomp::DefaultN64Mappings& values) {
-    assign_mapping_complete(device, recomp::GameInput::A, values.a);
-    assign_mapping_complete(device, recomp::GameInput::B, values.b);
-    assign_mapping_complete(device, recomp::GameInput::Z, values.z);
-    assign_mapping_complete(device, recomp::GameInput::START, values.start);
-    assign_mapping_complete(device, recomp::GameInput::DPAD_UP, values.dpad_up);
-    assign_mapping_complete(device, recomp::GameInput::DPAD_DOWN, values.dpad_down);
-    assign_mapping_complete(device, recomp::GameInput::DPAD_LEFT, values.dpad_left);
-    assign_mapping_complete(device, recomp::GameInput::DPAD_RIGHT, values.dpad_right);
-    assign_mapping_complete(device, recomp::GameInput::L, values.l);
-    assign_mapping_complete(device, recomp::GameInput::R, values.r);
-    assign_mapping_complete(device, recomp::GameInput::C_UP, values.c_up);
-    assign_mapping_complete(device, recomp::GameInput::C_DOWN, values.c_down);
-    assign_mapping_complete(device, recomp::GameInput::C_LEFT, values.c_left);
-    assign_mapping_complete(device, recomp::GameInput::C_RIGHT, values.c_right);
-
-    assign_mapping_complete(device, recomp::GameInput::X_AXIS_NEG, values.analog_left);
-    assign_mapping_complete(device, recomp::GameInput::X_AXIS_POS, values.analog_right);
-    assign_mapping_complete(device, recomp::GameInput::Y_AXIS_NEG, values.analog_down);
-    assign_mapping_complete(device, recomp::GameInput::Y_AXIS_POS, values.analog_up);
-
-    assign_mapping_complete(device, recomp::GameInput::TOGGLE_MENU, values.toggle_menu);
-    assign_mapping_complete(device, recomp::GameInput::ACCEPT_MENU, values.accept_menu);
-    assign_mapping_complete(device, recomp::GameInput::APPLY_MENU, values.apply_menu);
-    assign_mapping_complete(device, recomp::GameInput::SPRINT, values.sprint);
-};
-
-void zelda64::reset_input_bindings() {
-    assign_all_mappings(recomp::InputDevice::Keyboard, recomp::default_n64_keyboard_mappings);
-    assign_all_mappings(recomp::InputDevice::Controller, recomp::default_n64_controller_mappings);
+// Every input of one device in one style, from that style's defaults. include_shared false leaves the PC menu's inputs
+// (one set for both styles) as they are: for filling in the style a file didn't have.
+void assign_all_mappings(recomp::InputDevice device, recomp::ControlsStyle style, bool include_shared = true) {
+    const recomp::DefaultN64Mappings& values = recomp::get_default_mappings(device, style);
+    for (size_t i = 0; i < recomp::get_num_inputs(); i++) {
+        recomp::GameInput input = static_cast<recomp::GameInput>(i);
+        if (!include_shared && recomp::is_input_shared_by_styles(input)) {
+            continue;
+        }
+        assign_mapping_complete(device, style, input, recomp::get_default_mapping_for_input(values, input));
+    }
 }
 
+// No controls file yet (a new install): both styles' defaults, starting in recomp::default_controls_style.
+void zelda64::reset_input_bindings() {
+    for (recomp::ControlsStyle style : {recomp::ControlsStyle::Classic, recomp::ControlsStyle::Modern}) {
+        assign_all_mappings(recomp::InputDevice::Keyboard, style);
+        assign_all_mappings(recomp::InputDevice::Controller, style);
+    }
+    recomp::set_controls_style(recomp::default_controls_style);
+}
+
+// The Controls page's Reset: the current style's defaults.
 void zelda64::reset_cont_input_bindings() {
-    assign_all_mappings(recomp::InputDevice::Controller, recomp::default_n64_controller_mappings);
+    assign_all_mappings(recomp::InputDevice::Controller, recomp::get_controls_style());
 }
 
 void zelda64::reset_kb_input_bindings() {
-    assign_all_mappings(recomp::InputDevice::Keyboard, recomp::default_n64_keyboard_mappings);
+    assign_all_mappings(recomp::InputDevice::Keyboard, recomp::get_controls_style());
 }
 
 void zelda64::reset_single_input_binding(recomp::InputDevice device, recomp::GameInput input) {
-    assign_mapping_complete(
-        device,
-        input,
-        recomp::get_default_mapping_for_input(
-            device == recomp::InputDevice::Keyboard ?
-                recomp::default_n64_keyboard_mappings :
-                recomp::default_n64_controller_mappings,
-            input
-        )
-    );
+    recomp::ControlsStyle style = recomp::get_controls_style();
+    assign_mapping_complete(device, style, input,
+        recomp::get_default_mapping_for_input(recomp::get_default_mappings(device, style), input));
 }
 
 void reset_graphics_options() {
@@ -437,35 +423,51 @@ bool load_graphics_config(const std::filesystem::path& path) {
     return true;
 }
 
-void add_input_bindings(nlohmann::json& out, recomp::GameInput input, recomp::InputDevice device) {
+void add_input_bindings(nlohmann::json& out, recomp::GameInput input, recomp::InputDevice device, recomp::ControlsStyle style) {
     const std::string& input_name = recomp::get_input_enum_name(input);
     nlohmann::json& out_array = out[input_name];
     out_array = nlohmann::json::array();
     for (size_t binding_index = 0; binding_index < recomp::bindings_per_input; binding_index++) {
-        out_array[binding_index] = recomp::get_input_binding(input, binding_index, device);
+        out_array[binding_index] = recomp::get_input_binding(input, binding_index, device, style);
     }
 };
+
+// controls.json: "style", Classic controls' bindings under "keyboard" / "controller" (the keys Eltale Reborn has always
+// used, so a release build still reads its own layout), Modern controls' under "keyboard_modern" / "controller_modern".
+// Each style saves only the inputs it binds.
+static const char* bindings_key(recomp::InputDevice device, recomp::ControlsStyle style) {
+    bool kb = device == recomp::InputDevice::Keyboard;
+    if (style == recomp::ControlsStyle::Classic) {
+        return kb ? "keyboard" : "controller";
+    }
+    return kb ? "keyboard_modern" : "controller_modern";
+}
 
 bool save_controls_config(const std::filesystem::path& path) {
     nlohmann::json config_json{};
 
-    config_json["keyboard"] = {};
-    config_json["controller"] = {};
-
-    for (size_t i = 0; i < recomp::get_num_inputs(); i++) {
-        recomp::GameInput cur_input = static_cast<recomp::GameInput>(i);
-
-        add_input_bindings(config_json["keyboard"], cur_input, recomp::InputDevice::Keyboard);
-        add_input_bindings(config_json["controller"], cur_input, recomp::InputDevice::Controller);
+    config_json["style"] = recomp::get_controls_style();
+    for (recomp::ControlsStyle style : {recomp::ControlsStyle::Classic, recomp::ControlsStyle::Modern}) {
+        for (recomp::InputDevice device : {recomp::InputDevice::Keyboard, recomp::InputDevice::Controller}) {
+            nlohmann::json& out = config_json[bindings_key(device, style)];
+            out = nlohmann::json::object();
+            for (size_t i = 0; i < recomp::get_num_inputs(); i++) {
+                recomp::GameInput cur_input = static_cast<recomp::GameInput>(i);
+                if (recomp::is_input_used_by_style(cur_input, style)) {
+                    add_input_bindings(out, cur_input, device, style);
+                }
+            }
+        }
     }
 
     return save_json_with_backups(path, config_json);
 }
 
-bool load_input_device_from_json(const nlohmann::json& config_json, recomp::InputDevice device, const std::string& key) {
+// One device's bindings in one style from a json object; inputs it lacks get the style's defaults.
+bool load_input_device_from_json(const nlohmann::json& config_json, recomp::InputDevice device, recomp::ControlsStyle style, const std::string& key) {
     // Check if the json object for the given key exists.
     auto find_it = config_json.find(key);
-    if (find_it == config_json.end()) {
+    if (find_it == config_json.end() || !find_it->is_object()) {
         return false;
     }
 
@@ -478,29 +480,32 @@ bool load_input_device_from_json(const nlohmann::json& config_json, recomp::Inpu
         // Check if the json object for the given input exists and that it's an array.
         auto find_input_it = mappings_json.find(input_name);
         if (find_input_it == mappings_json.end() || !find_input_it->is_array()) {
-            assign_mapping(
-                device,
-                cur_input,
-                recomp::get_default_mapping_for_input(
-                    device == recomp::InputDevice::Keyboard ?
-                    recomp::default_n64_keyboard_mappings :
-                    recomp::default_n64_controller_mappings,
-                    cur_input
-                )
-            );
+            assign_mapping_complete(device, style, cur_input,
+                recomp::get_default_mapping_for_input(recomp::get_default_mappings(device, style), cur_input));
             continue;
         }
         const nlohmann::json& input_json = *find_input_it;
 
         // Deserialize all the bindings from the json array (up to the max number of bindings per input).
-        for (size_t binding_index = 0; binding_index < std::min(recomp::bindings_per_input, input_json.size()); binding_index++) {
+        for (size_t binding_index = 0; binding_index < recomp::bindings_per_input; binding_index++) {
             recomp::InputField cur_field{};
-            recomp::from_json(input_json[binding_index], cur_field);
-            recomp::set_input_binding(cur_input, binding_index, device, cur_field);
+            if (binding_index < input_json.size()) {
+                recomp::from_json(input_json[binding_index], cur_field);
+            }
+            recomp::set_input_binding(cur_input, binding_index, device, style, cur_field);
         }
     }
 
     return true;
+}
+
+static void load_style_bindings(const nlohmann::json& config_json, recomp::ControlsStyle style, const char* kb_key, const char* cont_key) {
+    if (!load_input_device_from_json(config_json, recomp::InputDevice::Keyboard, style, kb_key)) {
+        assign_all_mappings(recomp::InputDevice::Keyboard, style);
+    }
+    if (!load_input_device_from_json(config_json, recomp::InputDevice::Controller, style, cont_key)) {
+        assign_all_mappings(recomp::InputDevice::Controller, style);
+    }
 }
 
 bool load_controls_config(const std::filesystem::path& path) {
@@ -509,13 +514,26 @@ bool load_controls_config(const std::filesystem::path& path) {
         return false;
     }
 
-    if (!load_input_device_from_json(config_json, recomp::InputDevice::Keyboard, "keyboard")) {
-        assign_all_mappings(recomp::InputDevice::Keyboard, recomp::default_n64_keyboard_mappings);
+    if (config_json.contains("style")) {
+        // The current style last: both save the PC menu's shared inputs, and its copy is the one the player last saw.
+        recomp::ControlsStyle style = from_or_default(config_json, "style", recomp::default_controls_style);
+        if (style == recomp::ControlsStyle::Modern) {
+            load_style_bindings(config_json, recomp::ControlsStyle::Classic, "keyboard", "controller");
+            load_style_bindings(config_json, recomp::ControlsStyle::Modern, "keyboard_modern", "controller_modern");
+        } else {
+            load_style_bindings(config_json, recomp::ControlsStyle::Modern, "keyboard_modern", "controller_modern");
+            load_style_bindings(config_json, recomp::ControlsStyle::Classic, "keyboard", "controller");
+        }
+        recomp::set_controls_style(style);
+        return true;
     }
 
-    if (!load_input_device_from_json(config_json, recomp::InputDevice::Controller, "controller")) {
-        assign_all_mappings(recomp::InputDevice::Controller, recomp::default_n64_controller_mappings);
-    }
+    // A file from before the controls styles (a release's): its bindings are Classic controls', and the game starts in
+    // Classic, so nothing changes until the player picks Modern.
+    load_style_bindings(config_json, recomp::ControlsStyle::Classic, "keyboard", "controller");
+    assign_all_mappings(recomp::InputDevice::Keyboard, recomp::ControlsStyle::Modern, false);
+    assign_all_mappings(recomp::InputDevice::Controller, recomp::ControlsStyle::Modern, false);
+    recomp::set_controls_style(recomp::ControlsStyle::Classic);
     return true;
 }
 
