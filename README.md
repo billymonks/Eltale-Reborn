@@ -4,7 +4,7 @@ Eltale Reborn: Holy Magic Century is a modified PC Port of Quest 64 that overhau
 
 This repository does not include the ROM. You need your own copy of the US Quest 64 ROM to play or to build.
 
-A [Dreamcast port](https://github.com/billymonks/Eltale-Reborn-DC-Port) is also available.
+A [Dreamcast port](https://github.com/billymonks/Eltale-Reborn-DC-Port) is also available. A patch with these changes for the N64 version can be found [here](https://github.com/dpranker/Eltale-Reborn-N64-Port).
 
 ## Saves
 
