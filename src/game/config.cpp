@@ -39,6 +39,7 @@ constexpr auto transparency_default   = ultramodern::renderer::TransparencyMode:
 constexpr auto advanced_lighting_default = ultramodern::renderer::AdvancedLighting::Off;
 constexpr auto second_bounce_default  = ultramodern::renderer::SecondBounce::Off;
 constexpr auto advanced_water_default = ultramodern::renderer::AdvancedWater::On;
+constexpr auto object_culling_default = ultramodern::renderer::ObjectCulling::On;
 constexpr auto rt_upscaler_default    = ultramodern::renderer::RtUpscaler::Off;
 constexpr auto rt_upscaler_quality_default = ultramodern::renderer::RtUpscalerQuality::Quality;
 constexpr int rt_upscaler_sharpness_default = 50;
@@ -120,6 +121,7 @@ namespace ultramodern {
             {"advanced_lighting_option", config.advanced_lighting_option},
             {"second_bounce_option", config.second_bounce_option},
             {"advanced_water_option", config.advanced_water_option},
+            {"object_culling_option", config.object_culling_option},
             {"rt_upscaler_option", config.rt_upscaler_option},
             {"rt_upscaler_quality_option", config.rt_upscaler_quality_option},
             {"rt_upscaler_sharpness", config.rt_upscaler_sharpness},
@@ -146,6 +148,7 @@ namespace ultramodern {
         config.advanced_lighting_option = from_or_default(j, "advanced_lighting_option", advanced_lighting_default);
         config.second_bounce_option = from_or_default(j, "second_bounce_option", second_bounce_default);
         config.advanced_water_option = from_or_default(j, "advanced_water_option", advanced_water_default);
+        config.object_culling_option = from_or_default(j, "object_culling_option", object_culling_default);
         config.rt_upscaler_option = from_or_default(j, "rt_upscaler_option", rt_upscaler_default);
         config.rt_upscaler_quality_option = from_or_default(j, "rt_upscaler_quality_option", rt_upscaler_quality_default);
         config.rt_upscaler_sharpness = std::clamp(from_or_default(j, "rt_upscaler_sharpness", rt_upscaler_sharpness_default), 0, 100);
@@ -276,6 +279,7 @@ bool save_general_config(const std::filesystem::path& path) {
     config_json["mouse_sensitivity"] = recomp::get_mouse_sensitivity();
     config_json["joystick_deadzone"] = recomp::get_joystick_deadzone();
     config_json["film_grain_mode"] = zelda64::get_film_grain_mode();
+    config_json["rt_debug_keys_mode"] = zelda64::get_rt_debug_keys_mode();
     config_json["radio_comm_box_mode"] = zelda64::get_radio_comm_box_mode();
     config_json["invert_y_axis_mode"] = zelda64::get_invert_y_axis_mode();
     config_json["analog_camera_invert_mode"] = zelda64::get_analog_camera_invert_mode();
@@ -292,6 +296,7 @@ void set_general_settings_from_json(const nlohmann::json& config_json) {
     recomp::set_mouse_sensitivity(from_or_default(config_json, "mouse_sensitivity", is_steam_deck ? 50 : 0));
     recomp::set_joystick_deadzone(from_or_default(config_json, "joystick_deadzone", 0));
     zelda64::set_film_grain_mode(from_or_default(config_json, "film_grain_mode", zelda64::FilmGrainMode::On));
+    zelda64::set_rt_debug_keys_mode(from_or_default(config_json, "rt_debug_keys_mode", zelda64::RtDebugKeysMode::Off));
     zelda64::set_radio_comm_box_mode(from_or_default(config_json, "radio_comm_box_mode", zelda64::RadioBoxMode::Original));
     zelda64::set_invert_y_axis_mode(from_or_default(config_json, "invert_y_axis_mode", zelda64::AimInvertMode::On));
     zelda64::set_analog_camera_invert_mode(from_or_default(config_json, "analog_camera_invert_mode", zelda64::AimInvertMode::On));
@@ -393,6 +398,7 @@ void reset_graphics_options() {
     new_config.advanced_lighting_option = advanced_lighting_default;
     new_config.second_bounce_option = second_bounce_default;
     new_config.advanced_water_option = advanced_water_default;
+    new_config.object_culling_option = object_culling_default;
     new_config.rt_upscaler_option = rt_upscaler_default;
     new_config.rt_upscaler_quality_option = rt_upscaler_quality_default;
     new_config.rt_upscaler_sharpness = rt_upscaler_sharpness_default;

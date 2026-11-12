@@ -86,7 +86,7 @@
                                 data-checked="film_grain_mode"
                                 value="On"
                                 id="film_grain_mode_on"
-                                style="nav-up: #bg_input_enabled;"
+                                style="nav-up: #bg_input_enabled; nav-down: #rt_debug_keys_mode_on"
                             />
                             <label class="config-option__tab-label" for="film_grain_mode_on">On</label>
 
@@ -98,9 +98,39 @@
                                 data-checked="film_grain_mode"
                                 value="Off"
                                 id="film_grain_mode_off"
-                                style="nav-up: #bg_input_disabled;"
+                                style="nav-up: #bg_input_disabled; nav-down: #rt_debug_keys_mode_off"
                             />
                             <label class="config-option__tab-label" for="film_grain_mode_off">Off</label>
+                        </div>
+                    </div>
+
+                    <!-- Ray Tracing Debug Keys -->
+                    <div class="config-option" data-event-mouseover="set_cur_config_index(7)">
+                        <label class="config-option__title">Ray Tracing Debug Keys</label>
+                        <div class="config-option__list">
+                            <input
+                                type="radio"
+                                data-event-blur="set_cur_config_index(-1)"
+                                data-event-focus="set_cur_config_index(7)"
+                                name="rt_debug_keys_mode"
+                                data-checked="rt_debug_keys_mode"
+                                value="On"
+                                id="rt_debug_keys_mode_on"
+                                style="nav-up: #film_grain_mode_on;"
+                            />
+                            <label class="config-option__tab-label" for="rt_debug_keys_mode_on">On</label>
+
+                            <input
+                                type="radio"
+                                data-event-blur="set_cur_config_index(-1)"
+                                data-event-focus="set_cur_config_index(7)"
+                                name="rt_debug_keys_mode"
+                                data-checked="rt_debug_keys_mode"
+                                value="Off"
+                                id="rt_debug_keys_mode_off"
+                                style="nav-up: #film_grain_mode_off;"
+                            />
+                            <label class="config-option__tab-label" for="rt_debug_keys_mode_off">Off</label>
                         </div>
                     </div>
 
@@ -137,6 +167,9 @@
                     <p data-if="cur_config_index == 6">
                         Adds a visual effect that simulates the random grain you see in old film or high-ISO camera footage.
                         <br/>
+                    </p>
+                    <p data-if="cur_config_index == 7">
+                        Enables the path tracing debug keys. <b>F9</b> writes a diagnostics report for the pixel under the mouse cursor to rt.log, and <b>F10</b> cycles the debug views.
                     </p>
                     <p data-if="cur_config_index == 9">
                         Inverts the camera controls for the analog camera if it's enabled. <b>None</b> is the default.

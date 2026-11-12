@@ -95,6 +95,21 @@ namespace zelda64 {
     FilmGrainMode get_film_grain_mode();
     void set_film_grain_mode(FilmGrainMode mode);
 
+    enum class RtDebugKeysMode {
+        On,
+        Off,
+        OptionCount
+    };
+
+    NLOHMANN_JSON_SERIALIZE_ENUM(zelda64::RtDebugKeysMode, {
+        {zelda64::RtDebugKeysMode::On, "On"},
+        {zelda64::RtDebugKeysMode::Off, "Off"}
+    });
+
+    // F9 (diagnostics capture) and F10 (debug view cycling) for the ray tracer.
+    RtDebugKeysMode get_rt_debug_keys_mode();
+    void set_rt_debug_keys_mode(RtDebugKeysMode mode);
+
     AimInvertMode get_invert_y_axis_mode();
     void set_invert_y_axis_mode(AimInvertMode mode);
 

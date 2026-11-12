@@ -24,9 +24,6 @@ namespace quest64 {
 
 constexpr float axis_threshold = 0.5f;
 
-// F10 cycles the ray tracing debug views (RT64::cycleRaytracingDebugView). Off for players; set to true to bring it back.
-constexpr bool kEnableRtDebugHotkeys = false;
-
 struct ControllerState {
     SDL_GameController* controller;
     std::array<float, 3> latest_accelerometer;
@@ -223,7 +220,8 @@ bool sdl_event_filter(void* userdata, SDL_Event* event) {
             ) {
                 recompui::toggle_fullscreen();
             }
-            if (keyevent->keysym.scancode == SDL_Scancode::SDL_SCANCODE_F9) {
+            const bool rtDebugKeys = zelda64::get_rt_debug_keys_mode() == zelda64::RtDebugKeysMode::On;
+            if (rtDebugKeys && (keyevent->keysym.scancode == SDL_Scancode::SDL_SCANCODE_F9)) {
                 // Writes a full ray tracing diagnostics dump to rt.log for the next frame. Its per-pixel lines describe
                 // the pixel under the mouse cursor, or the screen center when the cursor isn't over the game.
                 SDL_Window *mouseWindow = SDL_GetMouseFocus();
@@ -247,7 +245,7 @@ bool sdl_event_filter(void* userdata, SDL_Event* event) {
                 // Logs Brian's map, room, position and facing to rt.log, for placing manual lights in Eltale Studio.
                 quest64::request_player_position_log();
             }
-            if (kEnableRtDebugHotkeys && (keyevent->keysym.scancode == SDL_Scancode::SDL_SCANCODE_F10) && ((keyevent->keysym.mod & KMOD_SHIFT) == 0)) {
+            if (rtDebugKeys && (keyevent->keysym.scancode == SDL_Scancode::SDL_SCANCODE_F10) && ((keyevent->keysym.mod & KMOD_SHIFT) == 0)) {
                 // Cycles the ray tracing debug views (normals, sun visibility, draw ids); logged to rt.log.
                 RT64::cycleRaytracingDebugView();
             }

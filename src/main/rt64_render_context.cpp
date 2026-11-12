@@ -1,3 +1,4 @@
+#include <atomic>
 #include <memory>
 #include <cstring>
 #include <variant>
@@ -45,6 +46,43 @@ static uint8_t IMEM[0x1000];
 
 namespace {
 extern "C" int recomp_smooth_transparency;
+
+std::atomic<bool> object_culling_enabled{ true };
+
+// Rodata the game's culling tests read, each read by a single function, so they can be overwritten in RDRAM.
+// func_8000DDB0 draws a billboard sprite (trees, bushes) only when it is under 1500 units from the camera and its
+// yaw from the camera's facing, scaled to degrees by the double at 0x80071228, is under the field of view.
+// func_80007F18 draws an NPC only within sqrt(90000) units of Brian, and with perspective textures within sqrt(20000).
+struct CullConstant {
+    uint32_t address;
+    uint32_t words;
+    uint32_t unculled[2];
+};
+constexpr CullConstant cull_constants[] = {
+    { 0x80071220u, 1, { 0x47C35000u } },      // sprite distance: 100000.0f
+    { 0x80071228u, 2, { 0u, 0u } },           // sprite angle scale: 0.0, so every angle passes
+    { 0x80071128u, 1, { 0x7F7FFFFFu } },      // NPC squared distance: FLT_MAX
+    { 0x80071124u, 1, { 0x7F7FFFFFu } },      // NPC perspective textures: FLT_MAX
+};
+
+void apply_object_culling(uint8_t* rdram) {
+    static uint32_t original[std::size(cull_constants)][2];
+    static bool captured = false;
+    const bool enabled = object_culling_enabled.load();
+    if (!captured) {
+        if (enabled) {
+            return;
+        }
+        for (size_t i = 0; i < std::size(cull_constants); i++) {
+            std::memcpy(original[i], rdram + (cull_constants[i].address - 0x80000000u), cull_constants[i].words * sizeof(uint32_t));
+        }
+        captured = true;
+    }
+    for (size_t i = 0; i < std::size(cull_constants); i++) {
+        const uint32_t* words = enabled ? original[i] : cull_constants[i].unculled;
+        std::memcpy(rdram + (cull_constants[i].address - 0x80000000u), words, cull_constants[i].words * sizeof(uint32_t));
+    }
+}
 
 thread_local std::vector<size_t> fade_group_depths;
 
@@ -301,6 +339,8 @@ void set_application_user_config(RT64::Application* application, const ultramode
     // The second light bounce isn't offered: always one bounce, whatever graphics.json says.
     RT64::setRaytracingIndirectBounces(1);
     RT64::setRaytracingAdvancedWater(config.advanced_water_option == ultramodern::renderer::AdvancedWater::On);
+    // Without ray traced lighting every unculled sprite takes a slot in the game's 64 entry flat shadow queue.
+    object_culling_enabled = !application->userConfig.advancedLighting || (config.object_culling_option != ultramodern::renderer::ObjectCulling::Off);
     // The enum values match RT64::RaytracingUpscaler (Off, FSR 1, FSR 3) and the quality index of setRaytracingUpscaler.
     RT64::setRaytracingUpscaler(uint32_t(config.rt_upscaler_option), uint32_t(config.rt_upscaler_quality_option), float(std::clamp(config.rt_upscaler_sharpness, 0, 100)) / 100.0f);
     // The enum values are the level indices of setRaytracingLightQuality (samples 0 = 1, 1 = 2, 2 = 4 rays).
@@ -479,6 +519,7 @@ void zelda64::renderer::RT64Context::send_dl(const OSTask* task) {
         gbi->map[G_SETSCISSOR] = quest64_scissor;
         gbi->map[G_FILLRECT] = quest64_fill_rect;
     }
+    apply_object_culling(app->core.RDRAM);
     app->state->setSceneLight(quest64::scene_light_from_game(app->core.RDRAM));
     app->processDisplayLists(app->core.RDRAM, task->t.data_ptr & 0x3FFFFFF, 0, true);
 }
