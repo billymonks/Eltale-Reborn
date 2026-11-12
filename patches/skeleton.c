@@ -324,6 +324,37 @@ static void gfx_words(Gfx** gfx, u32 w0, u32 w1) {
     (*gfx)++;
 }
 
+f32 func_80023210(f32 x, f32 z);
+
+#define SHADOW_VIEW_PI 3.14159265f
+// Far plane of the game's projection.
+#define SHADOW_VIEW_DISTANCE 2400.0f
+// The game culls sprites at the vertical field of view; this covers the horizontal one up to about 32:9.
+#define SHADOW_VIEW_FOV_SCALE 1.5f
+
+// The game's sprite cull (func_8000DDB0), widened: whether x, z is in front of the camera.
+static s32 shadow_in_view(f32 x, f32 z) {
+    u8* camera = (u8*) &D_80086DC0;
+    f32 dx = x - *(f32*) (camera + 0x0C);
+    f32 dz = z - *(f32*) (camera + 0x14);
+    f32 angle;
+
+    if ((dx * dx + dz * dz) >= (SHADOW_VIEW_DISTANCE * SHADOW_VIEW_DISTANCE)) {
+        return 0;
+    }
+    angle = func_80023210(dx, dz) - *(f32*) (camera + 0x2C) + SHADOW_VIEW_PI;
+    while (angle > SHADOW_VIEW_PI) {
+        angle -= 2.0f * SHADOW_VIEW_PI;
+    }
+    while (angle < -SHADOW_VIEW_PI) {
+        angle += 2.0f * SHADOW_VIEW_PI;
+    }
+    if (angle < 0.0f) {
+        angle = -angle;
+    }
+    return (angle * (180.0f / SHADOW_VIEW_PI)) < (*(f32*) 0x80086EC8 * SHADOW_VIEW_FOV_SCALE);
+}
+
 // Queues a shadow under an actor for func_800118D4 to draw.
 // Advanced lighting casts real shadows, so the flat ones are left out.
 RECOMP_PATCH void func_80011860(f32 x, f32 y, f32 z, f32 rotX, f32 rotY, f32 rotZ, f32 scale) {
@@ -331,6 +362,12 @@ RECOMP_PATCH void func_80011860(f32 x, f32 y, f32 z, f32 rotX, f32 rotY, f32 rot
 
     if (recomp_get_advanced_lighting_enabled()) {
         sSkelShadowObject = NULL;
+        return;
+    }
+
+    // With culling off every sprite (trees, bushes) queues a shadow, more than the queue holds, so characters'
+    // shadows could be crowded out. Characters are always queued; other shadows only near the view.
+    if ((sSkelShadowObject == NULL) && recomp_get_object_culling_disabled() && !shadow_in_view(x, z)) {
         return;
     }
 

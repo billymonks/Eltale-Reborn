@@ -355,8 +355,7 @@
                                 data-checked="advanced_water_option"
                                 value="Off"
                                 id="water_off"
-                                style="nav-up: #lighting_off; nav-down: #apply_button"
-                                data-style-nav-down="advanced_lighting_option == 'On' ? '#culling_off' : '#apply_button'"
+                                style="nav-up: #lighting_off; nav-down: #culling_off"
                             />
                             <label class="config-option__tab-label" for="water_off">Off</label>
                             <input type="radio"
@@ -366,14 +365,13 @@
                                 data-checked="advanced_water_option"
                                 value="On"
                                 id="water_on"
-                                style="nav-up: #lighting_on; nav-down: #apply_button"
-                                data-style-nav-down="advanced_lighting_option == 'On' ? '#culling_on' : '#apply_button'"
+                                style="nav-up: #lighting_on; nav-down: #culling_on"
                             />
                             <label class="config-option__tab-label" for="water_on">On</label>
                         </div>
                     </div>
 
-                    <div class="config-option" data-if="advanced_lighting_option == 'On'" data-event-mouseover="set_cur_config_index(18)">
+                    <div class="config-option" data-event-mouseover="set_cur_config_index(18)">
                         <label class="config-option__title">Object Culling</label>
                         <div class="config-option__list">
                             <input type="radio"
@@ -667,7 +665,7 @@
                         Modern water with reflections, waves and sun glints. Requires Ray Traced Lighting.
                     </p>
                     <p data-if="cur_config_index == 18">
-                        <b>On</b> matches the original game, which skips trees and bushes outside the camera's view and characters far from Brian. <b>Off</b> keeps drawing them, so their ray traced shadows don't disappear when they leave the screen.
+                        <b>On</b> matches the original game, which skips trees and bushes outside the camera's view and characters far from Brian. <b>Off</b> keeps drawing them, so characters can be seen from further away and, with Ray Traced Lighting, shadows don't disappear when their objects leave the screen.
                     </p>
                     <p data-if="cur_config_index == 15">
                         Higher settings cast more rays and look cleaner, especially when moving. Each step doubles the cost of the lighting.
@@ -699,8 +697,8 @@
                         data-attrif-disabled="!options_changed"
                         onclick="apply_options"
                         id="apply_button"
-                        style="nav-up:#water_off"
-                        data-style-nav-up="advanced_lighting_option == 'On' ? '#sharpness_input' : '#water_off'"
+                        style="nav-up:#culling_off"
+                        data-style-nav-up="advanced_lighting_option == 'On' ? '#sharpness_input' : '#culling_off'"
                     >
                         <div class="button__label">Apply<span class="prompt-font-sm">{{gfx_help__apply}}</span></div>
                     </button>

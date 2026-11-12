@@ -13,5 +13,6 @@ DECLARE_FUNC(u32, recomp_get_pending_set_time);
 DECLARE_FUNC(s32, recomp_get_film_grain_enabled);
 DECLARE_FUNC(s32, recomp_get_smooth_transparency);
 DECLARE_FUNC(s32, recomp_get_advanced_lighting_enabled);
+DECLARE_FUNC(s32, recomp_get_object_culling_disabled);
 
 #endif

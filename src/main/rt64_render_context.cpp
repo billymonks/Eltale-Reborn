@@ -339,8 +339,7 @@ void set_application_user_config(RT64::Application* application, const ultramode
     // The second light bounce isn't offered: always one bounce, whatever graphics.json says.
     RT64::setRaytracingIndirectBounces(1);
     RT64::setRaytracingAdvancedWater(config.advanced_water_option == ultramodern::renderer::AdvancedWater::On);
-    // Without ray traced lighting every unculled sprite takes a slot in the game's 64 entry flat shadow queue.
-    object_culling_enabled = !application->userConfig.advancedLighting || (config.object_culling_option != ultramodern::renderer::ObjectCulling::Off);
+    object_culling_enabled = config.object_culling_option != ultramodern::renderer::ObjectCulling::Off;
     // The enum values match RT64::RaytracingUpscaler (Off, FSR 1, FSR 3) and the quality index of setRaytracingUpscaler.
     RT64::setRaytracingUpscaler(uint32_t(config.rt_upscaler_option), uint32_t(config.rt_upscaler_quality_option), float(std::clamp(config.rt_upscaler_sharpness, 0, 100)) / 100.0f);
     // The enum values are the level indices of setRaytracingLightQuality (samples 0 = 1, 1 = 2, 2 = 4 rays).

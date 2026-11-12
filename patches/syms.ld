@@ -73,3 +73,4 @@ osPfsInitPak_recomp = 0x8F0000F4;
 osPfsFileState_recomp = 0x8F0000F8;
 osPfsFreeBlocks_recomp = 0x8F0000FC;
 recomp_get_advanced_lighting_enabled = 0x8F000100;
+recomp_get_object_culling_disabled = 0x8F000104;
