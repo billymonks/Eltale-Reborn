@@ -1677,117 +1677,165 @@ scrollbarhorizontal sliderbar {
   margin-right: 10dp;
 }
 
-.dc-pad__shoulders {
+/* The Controls page's Modern / Classic controls tabs (controls.rml .controls-style), beside the device toggle. */
+.controls-style {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
-  padding: 10dp 22dp 0 22dp;
-}
-.dc-shoulder {
-  display: flex;
-  flex-direction: column;
   align-items: center;
+  margin-left: 12dp;
 }
-.dc-shoulder__name {
-  margin-bottom: 2dp;
+.controls-style__tab {
+  display: block;
+  margin-right: 8dp;
+  padding: 10dp 18dp;
+  border-width: 1.1dp;
+  border-radius: 12dp;
+  border-color: rgba(255, 255, 255, 0.15);
+  background-color: rgba(255, 255, 255, 0.03);
   color: #9AA0A6;
-  font-size: 14dp;
+  font-size: 18dp;
   font-weight: 700;
   letter-spacing: 0.4dp;
-  line-height: 16dp;
+  line-height: 22dp;
+  transition: color 0.05s linear-in-out, background-color 0.05s linear-in-out, border-color 0.05s linear-in-out;
+  nav-left: auto;
+  nav-right: auto;
+  focus: auto;
+  tab-index: auto;
 }
-.dc-trigger {
-  width: 112dp;
-  height: 40dp;
-  border-width: 2dp;
-  border-color: #17D6E8;
-  border-radius: 14dp;
-  background-color: rgba(23, 214, 232, 0.28);
+.controls-style__tab--active {
+  border-color: rgba(185, 125, 242, 0.8);
+  background-color: rgba(185, 125, 242, 0.25);
+  color: #FFFFFF;
 }
-.dc-trigger--right {
-  border-color: #F86039;
-  background-color: rgba(248, 96, 57, 0.28);
+.controls-style__tab:hover, .controls-style__tab:focus {
+  border-color: #FFFFFF;
+  color: #FFFFFF;
 }
-.dc-pad__body {
+
+/* The Controls page's pad map (controls.rml .pad-map; its data is ui_config.cpp's PadView). Hand-written here, like
+   the Dreamcast pad rules it replaces: these rules are not in the SCSS sources. */
+.pad-map {
   display: flex;
-  flex: 1 1 auto;
+  flex: 1 1 560dp;
+  flex-direction: column;
+  min-width: 440dp;
+  max-width: 880dp;
+  height: 100%;
+  justify-content: center;
+  padding: 8dp 12dp 8dp 20dp;
+  overflow-y: auto;
+  color: #CCCCCC;
+  font-size: 17dp;
+  line-height: 21dp;
+}
+.pad-map__top {
+  display: flex;
+  flex: 0 0 auto;
   flex-direction: row;
   align-items: center;
-  justify-content: space-between;
-  padding: 8dp 18dp 16dp 18dp;
 }
-.dc-pad__left {
+.pad-map__side {
   display: flex;
+  flex: 1 1 0dp;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  min-width: 0;
 }
-.dc-pad__stick.input-config__visual-stick {
-  width: 132dp;
-  height: 132dp;
+.pad-map__drawing {
+  flex: 0 0 47%;
+  padding: 0 10dp;
 }
-.dc-pad__stick .input-viz__dpad-arrow {
-  width: 40dp;
-  height: 40dp;
-}
-.dc-pad__dpad.input-viz.input-viz__dpad {
-  width: 148dp;
-  height: 148dp;
-  margin-top: 10dp;
-}
-.dc-pad__dpad.input-viz.input-viz__dpad > svg {
-  width: 148dp;
-  height: 148dp;
-}
-.dc-pad__dpad .input-viz__dpad-arrow {
-  width: 42dp;
-  height: 42dp;
-}
-.dc-pad__start {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 28dp;
-}
-.dc-pad__face {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.dc-face {
+.pad-map__drawing-aspect {
   position: relative;
-  width: 196dp;
-  height: 196dp;
+  width: 100%;
 }
-.dc-face__lr, .dc-face__du {
-  display: flex;
+/* RmlUi stretches an SVG to its box: width 100% and height auto keep the drawing's own 400 x 262 shape, and it sits in
+   the flow, so the box the highlights are placed in (in % of it) is exactly the drawing. */
+.pad-map__outline {
+  display: block;
+  width: 100%;
+  height: auto;
+  image-color: #E4E4E4;
+}
+/* A control's highlight: a layer the size of the drawing (ModernPad_<control>.svg, the same canvas with only that
+   control filled in), shown while it is lit, so it matches the outline at any scale. scripts/make_pad.py writes both. */
+.pad-map__lit {
   position: absolute;
   top: 0;
-  right: 0;
-  bottom: 0;
   left: 0;
+  width: 100%;
+  height: 100%;
 }
-.dc-face__lr {
+.pad-map__row {
+  display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: space-between;
+  padding: 3dp 6dp;
+  border-radius: 6dp;
+  background-color: rgba(185, 125, 242, 0);
+  transition: background-color 0.08s linear-in-out, color 0.08s linear-in-out;
 }
-.dc-face__du {
-  flex-direction: column-reverse;
-  align-items: center;
-  justify-content: space-between;
+.pad-map__row--left {
+  justify-content: flex-end;
+  text-align: right;
 }
-.dc-btn--a svg {
-  image-color: #3DDC5A;
+.pad-map__row--lit {
+  background-color: rgba(185, 125, 242, 0.3);
+  color: #FFFFFF;
 }
-.dc-btn--b svg {
-  image-color: #E23B3B;
+.pad-map__actions {
+  display: flex;
+  flex: 0 1 auto;
+  flex-direction: column;
+  min-width: 0;
 }
-.dc-btn--x svg {
-  image-color: #4C6FFF;
+.pad-map__row--left .pad-map__actions {
+  align-items: flex-end;
 }
-.dc-btn--y svg {
-  image-color: #E6C229;
+.pad-map__glyph {
+  flex: 0 0 auto;
+  width: 40dp;
+  font-family: promptfont;
+  font-size: 32dp;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 32dp;
+  text-align: center;
+}
+.pad-map__glyph--text {
+  font-family: "latolatin";
+  font-size: 15dp;
+  font-weight: 700;
+  line-height: 20dp;
+}
+.pad-map__row--left .pad-map__glyph {
+  margin-left: 8dp;
+}
+.pad-map__row--right .pad-map__glyph {
+  margin-right: 8dp;
+}
+.pad-map__none {
+  color: #6B6F75;
+}
+.pad-map__sections {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: row;
+  flex-wrap: wrap;
+  margin-top: 26dp;
+}
+.pad-map__section {
+  flex: 1 1 160dp;
+  min-width: 150dp;
+  padding: 4dp 6dp;
+}
+.pad-map__heading {
+  margin-bottom: 6dp;
+  color: #9AA0A6;
+  font-size: 15dp;
+  font-weight: 700;
+  letter-spacing: 0.6dp;
+  line-height: 18dp;
 }
 
 .button {
