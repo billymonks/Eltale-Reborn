@@ -13,6 +13,7 @@
 namespace RT64 {
     // Defined in rt64_raytracing_resources.cpp.
     void requestRaytracingDiagnosticsCapture();
+    void setRaytracingDiagnosticsPixel(float x, float y);
     void cycleRaytracingDebugView();
 }
 
@@ -223,7 +224,23 @@ bool sdl_event_filter(void* userdata, SDL_Event* event) {
                 recompui::toggle_fullscreen();
             }
             if (keyevent->keysym.scancode == SDL_Scancode::SDL_SCANCODE_F9) {
-                // Writes a full ray tracing diagnostics dump to rt.log for the next frame.
+                // Writes a full ray tracing diagnostics dump to rt.log for the next frame. Its per-pixel lines describe
+                // the pixel under the mouse cursor, or the screen center when the cursor isn't over the game.
+                SDL_Window *mouseWindow = SDL_GetMouseFocus();
+                int windowWidth = 0;
+                int windowHeight = 0;
+                int mouseX = 0;
+                int mouseY = 0;
+                if (mouseWindow != nullptr) {
+                    SDL_GetWindowSize(mouseWindow, &windowWidth, &windowHeight);
+                    SDL_GetMouseState(&mouseX, &mouseY);
+                }
+                if ((windowWidth > 0) && (windowHeight > 0)) {
+                    RT64::setRaytracingDiagnosticsPixel(float(mouseX) / float(windowWidth), float(mouseY) / float(windowHeight));
+                }
+                else {
+                    RT64::setRaytracingDiagnosticsPixel(-1.0f, -1.0f);
+                }
                 RT64::requestRaytracingDiagnosticsCapture();
             }
             if (keyevent->keysym.scancode == SDL_Scancode::SDL_SCANCODE_F8) {
