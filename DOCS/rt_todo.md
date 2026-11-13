@@ -2,13 +2,38 @@
 
 Ideas for more graphical fidelity in the path tracer (`lib/rt64`), not started yet.
 
-## Volumetric fog and light shafts
+## Volumetric fog and light shafts (first version in)
 
-Fog that the sun, moon and point lights scatter through, so windows, torches and forest canopies throw visible shafts.
-Ray march the primary ray through a homogeneous medium (a density and colour per room, next to `"sun and moon"` in
-`rt_lights.json`'s room settings), sampling one light per step with a shadow ray, and denoise the result at low
-resolution. Things to find out: the cost per frame, how well it holds up under the denoiser and upscaler, and
-whether the game's own N64 fog should drive the density or be turned off where the volumetric fog is on.
+Graphics menu "Volumetric Fog" (on by default). It keeps the game's look where the air is evenly lit: air in the
+sun's or moon's shadow darkens what's behind it (shafts between shadows), and the sun and lights glow in it (screen
+blended); it fades out by its distance, so far terrain and the sky are untouched. Rooms with a `"fog"` in
+`rt_lights.json`'s room settings use it; outdoor rooms (sun or moon on) without one get the defaults, thicker around
+sunrise and sunset, and indoor rooms none. `DirectRayGen` marches the camera ray in 12 segments
+that lengthen with distance, each with a sun or moon shadow ray and one shadow ray towards the strongest point light;
+the result is blended with last frame's (`gVolumetric`) and blurred edge-aware in `ComposePS`. Per room: density,
+glow tint, ambient, sun glow, light glow, shadows, anisotropy, height falloff, distance and how much of the game's N64
+fog stays, plus keyframes on the game clock. Edited in Studio's
+Rooms panel. Still to find out: the cost per frame (the F9 capture's pass timings, Direct pass), how well it holds up
+under fast camera moves and the upscaler, whether 12 segments are enough outdoors, and whether rendering it at half
+resolution is needed.
+
+## God rays (first version in)
+
+Graphics menu "God Rays" (on by default). Screen space, in `DirectRayGen` after the primary rays: each pixel gathers
+32 samples along the line towards the light's vanishing point, from the sky (camera ray missed) weighted by closeness
+to the sun or moon, and from textures of `rt_materials.json` class "window" in their own color (the indoor fake: the
+light's direction comes from the room settings' "ray azimuth" / "ray elevation", or the sun's, turned by "window bias"
+towards the way the nearest, largest windows face out). Added to the volumetric fog's glow,
+so it shares its history and blur. Still to find out: raster-only draws count as sky (the camera ray misses them),
+so distant scenery not in the ray traced scene may shine; windows drawn raster-only (blended, no depth write) can't be
+flagged.
+
+## Light through windows indoors, ray traced
+
+The screen space god rays fake it; the real thing would treat each window's triangles as an area light shining into
+the room along the room's ray direction, colored by the stained glass. The volumetric fog then samples them like the
+sun (one shadow ray towards a point on the window), so the beams fall across the floor and through the air, and the
+floor gets the colored light too.
 
 ## Bloom for emissive surfaces
 

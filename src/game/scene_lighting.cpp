@@ -220,28 +220,31 @@ RT64::SceneLight quest64::scene_light_from_game(const uint8_t* rdram) {
     light.room = room;
     light.areaName = room_light.name;
 
-    // F8: where Brian stands, in the format Eltale Studio's Paste field reads, for placing manual lights.
+    float day_length = float(read_s32(rdram, gDayLength));
+    if (!(day_length > 0.0f)) {
+        day_length = DefaultDayLength;
+    }
+
+    // The lighting time is what the room's own lights and fog are blended from.
+    int32_t time = read_s32(rdram, gLightTime);
+    if ((time < 0) || (float(time) >= day_length)) {
+        time = read_s32(rdram, gCurrentTime);
+    }
+    const float wrapped = std::fmod(std::fmod(float(time), day_length) + day_length, day_length);
+    // Sunrise (5625 of 27000 ticks) is 5:00 and sunset 19:00.
+    light.clockHour = wrapped / day_length * 24.0f;
+
+    // F8: where Brian stands, in the format Eltale Studio's Paste field reads, for placing manual lights, and the clock
+    // for its fog keyframes.
     if (player_position_requested.exchange(false)) {
-        RT64::rtDiagLog("player position: map %d room %d (%.2f, %.2f, %.2f) facing %.2f", map, room,
-            read_f32(rdram, gPlayerPosX), read_f32(rdram, gPlayerPosX + 4), read_f32(rdram, gPlayerPosX + 8), read_f32(rdram, gPlayerFacing));
+        RT64::rtDiagLog("player position: map %d room %d (%.2f, %.2f, %.2f) facing %.2f, clock %.2f h", map, room,
+            read_f32(rdram, gPlayerPosX), read_f32(rdram, gPlayerPosX + 4), read_f32(rdram, gPlayerPosX + 8), read_f32(rdram, gPlayerFacing), light.clockHour);
     }
 
     switch (room_light.kind) {
-        case LightKind::Outdoor: {
-            float day_length = float(read_s32(rdram, gDayLength));
-            if (!(day_length > 0.0f)) {
-                day_length = DefaultDayLength;
-            }
-
-            // The lighting time is what the room's own lights and fog are blended from.
-            int32_t time = read_s32(rdram, gLightTime);
-            if ((time < 0) || (float(time) >= day_length)) {
-                time = read_s32(rdram, gCurrentTime);
-            }
-            const float wrapped = std::fmod(std::fmod(float(time), day_length) + day_length, day_length);
+        case LightKind::Outdoor:
             set_sky_light(light, room_light, wrapped, day_length);
             break;
-        }
         case LightKind::Interior:
             set_direction(light, room_light.yaw, room_light.pitch);
             set_style(light, 0.60f, 0.56f, 0.52f, 0.80f, 1.0f);

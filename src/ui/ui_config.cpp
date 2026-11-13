@@ -676,6 +676,8 @@ public:
         );
         bind_option(constructor, "advanced_water_option", &new_options.advanced_water_option);
         bind_option(constructor, "object_culling_option", &new_options.object_culling_option);
+        bind_option(constructor, "volumetric_fog_option", &new_options.volumetric_fog_option);
+        bind_option(constructor, "god_rays_option", &new_options.god_rays_option);
         bind_option(constructor, "rt_upscaler_option", &new_options.rt_upscaler_option);
         bind_option(constructor, "rt_upscaler_quality_option", &new_options.rt_upscaler_quality_option);
         bind_option(constructor, "rt_light_samples_option", &new_options.rt_light_samples_option);

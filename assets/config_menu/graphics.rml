@@ -382,7 +382,7 @@
                                 value="Off"
                                 id="culling_off"
                                 style="nav-up: #water_off; nav-down: #apply_button"
-                                data-style-nav-down="advanced_lighting_option == 'On' ? '#samples_one' : '#apply_button'"
+                                data-style-nav-down="advanced_lighting_option == 'On' ? '#fog_off' : '#apply_button'"
                             />
                             <label class="config-option__tab-label" for="culling_off">Off</label>
                             <input type="radio"
@@ -393,9 +393,61 @@
                                 value="On"
                                 id="culling_on"
                                 style="nav-up: #water_on; nav-down: #apply_button"
-                                data-style-nav-down="advanced_lighting_option == 'On' ? '#samples_two' : '#apply_button'"
+                                data-style-nav-down="advanced_lighting_option == 'On' ? '#fog_on' : '#apply_button'"
                             />
                             <label class="config-option__tab-label" for="culling_on">On</label>
+                        </div>
+                    </div>
+
+                    <div class="config-option" data-if="advanced_lighting_option == 'On'" data-event-mouseover="set_cur_config_index(19)">
+                        <label class="config-option__title">Volumetric Fog</label>
+                        <div class="config-option__list">
+                            <input type="radio"
+                                data-event-blur="set_cur_config_index(-1)"
+                                data-event-focus="set_cur_config_index(19)"
+                                name="volumetricfog"
+                                data-checked="volumetric_fog_option"
+                                value="Off"
+                                id="fog_off"
+                                style="nav-up: #culling_off; nav-down: #rays_off"
+                            />
+                            <label class="config-option__tab-label" for="fog_off">Off</label>
+                            <input type="radio"
+                                data-event-blur="set_cur_config_index(-1)"
+                                data-event-focus="set_cur_config_index(19)"
+                                name="volumetricfog"
+                                data-checked="volumetric_fog_option"
+                                value="On"
+                                id="fog_on"
+                                style="nav-up: #culling_on; nav-down: #rays_on"
+                            />
+                            <label class="config-option__tab-label" for="fog_on">On</label>
+                        </div>
+                    </div>
+
+                    <div class="config-option" data-if="advanced_lighting_option == 'On'" data-event-mouseover="set_cur_config_index(20)">
+                        <label class="config-option__title">God Rays</label>
+                        <div class="config-option__list">
+                            <input type="radio"
+                                data-event-blur="set_cur_config_index(-1)"
+                                data-event-focus="set_cur_config_index(20)"
+                                name="godrays"
+                                data-checked="god_rays_option"
+                                value="Off"
+                                id="rays_off"
+                                style="nav-up: #fog_off; nav-down: #samples_one"
+                            />
+                            <label class="config-option__tab-label" for="rays_off">Off</label>
+                            <input type="radio"
+                                data-event-blur="set_cur_config_index(-1)"
+                                data-event-focus="set_cur_config_index(20)"
+                                name="godrays"
+                                data-checked="god_rays_option"
+                                value="On"
+                                id="rays_on"
+                                style="nav-up: #fog_on; nav-down: #samples_two"
+                            />
+                            <label class="config-option__tab-label" for="rays_on">On</label>
                         </div>
                     </div>
 
@@ -409,7 +461,7 @@
                                 data-checked="rt_light_samples_option"
                                 value="One"
                                 id="samples_one"
-                                style="nav-up: #culling_off; nav-down: #denoiser_off"
+                                style="nav-up: #rays_off; nav-down: #denoiser_off"
                             />
                             <label class="config-option__tab-label" for="samples_one">1x</label>
                             <input type="radio"
@@ -419,7 +471,7 @@
                                 data-checked="rt_light_samples_option"
                                 value="Two"
                                 id="samples_two"
-                                style="nav-up: #culling_on; nav-down: #denoiser_low"
+                                style="nav-up: #rays_on; nav-down: #denoiser_low"
                             />
                             <label class="config-option__tab-label" for="samples_two">2x</label>
                             <input type="radio"
@@ -429,7 +481,7 @@
                                 data-checked="rt_light_samples_option"
                                 value="Four"
                                 id="samples_four"
-                                style="nav-up: #culling_on; nav-down: #denoiser_high"
+                                style="nav-up: #rays_on; nav-down: #denoiser_high"
                             />
                             <label class="config-option__tab-label" for="samples_four">4x</label>
                         </div>
@@ -666,6 +718,12 @@
                     </p>
                     <p data-if="cur_config_index == 18">
                         <b>On</b> matches the original game, which skips trees and bushes outside the camera's view and characters far from Brian. <b>Off</b> keeps drawing them, so characters can be seen from further away and, with Ray Traced Lighting, shadows don't disappear when their objects leave the screen.
+                    </p>
+                    <p data-if="cur_config_index == 19">
+                        Ray traced haze outdoors: air in the shadows of trees and buildings darkens, so sunlit air between them shows as light shafts, and the sun, moon and lights glow through it. Indoors only where an area has it set up. Adds to the cost of the lighting where it appears.
+                    </p>
+                    <p data-if="cur_config_index == 20">
+                        Rays of light streaming from the sky around the sun or moon past trees and buildings, and from some stained glass windows indoors. Cheap.
                     </p>
                     <p data-if="cur_config_index == 15">
                         Higher settings cast more rays and look cleaner, especially when moving. Each step doubles the cost of the lighting.

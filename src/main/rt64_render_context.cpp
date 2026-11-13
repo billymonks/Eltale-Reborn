@@ -28,6 +28,8 @@ namespace RT64 {
     // Defined in rt64_raytracing_resources.cpp.
     void setRaytracingIndirectBounces(uint32_t bounces);
     void setRaytracingAdvancedWater(bool enabled);
+    void setRaytracingVolumetricFog(bool enabled);
+    void setRaytracingGodRays(bool enabled);
     // Defined in rt64_raytracing_upscale.cpp.
     void setRaytracingUpscaler(uint32_t mode, uint32_t quality, float sharpness);
     // Defined in rt64_raytracing_denoise.cpp.
@@ -339,6 +341,8 @@ void set_application_user_config(RT64::Application* application, const ultramode
     // The second light bounce isn't offered: always one bounce, whatever graphics.json says.
     RT64::setRaytracingIndirectBounces(1);
     RT64::setRaytracingAdvancedWater(config.advanced_water_option == ultramodern::renderer::AdvancedWater::On);
+    RT64::setRaytracingVolumetricFog(config.volumetric_fog_option == ultramodern::renderer::VolumetricFog::On);
+    RT64::setRaytracingGodRays(config.god_rays_option == ultramodern::renderer::GodRays::On);
     object_culling_enabled = config.object_culling_option != ultramodern::renderer::ObjectCulling::Off;
     // The enum values match RT64::RaytracingUpscaler (Off, FSR 1, FSR 3) and the quality index of setRaytracingUpscaler.
     RT64::setRaytracingUpscaler(uint32_t(config.rt_upscaler_option), uint32_t(config.rt_upscaler_quality_option), float(std::clamp(config.rt_upscaler_sharpness, 0, 100)) / 100.0f);

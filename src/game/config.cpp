@@ -40,6 +40,8 @@ constexpr auto advanced_lighting_default = ultramodern::renderer::AdvancedLighti
 constexpr auto second_bounce_default  = ultramodern::renderer::SecondBounce::Off;
 constexpr auto advanced_water_default = ultramodern::renderer::AdvancedWater::On;
 constexpr auto object_culling_default = ultramodern::renderer::ObjectCulling::On;
+constexpr auto volumetric_fog_default = ultramodern::renderer::VolumetricFog::On;
+constexpr auto god_rays_default       = ultramodern::renderer::GodRays::On;
 constexpr auto rt_upscaler_default    = ultramodern::renderer::RtUpscaler::Off;
 constexpr auto rt_upscaler_quality_default = ultramodern::renderer::RtUpscalerQuality::Quality;
 constexpr int rt_upscaler_sharpness_default = 50;
@@ -122,6 +124,8 @@ namespace ultramodern {
             {"second_bounce_option", config.second_bounce_option},
             {"advanced_water_option", config.advanced_water_option},
             {"object_culling_option", config.object_culling_option},
+            {"volumetric_fog_option", config.volumetric_fog_option},
+            {"god_rays_option", config.god_rays_option},
             {"rt_upscaler_option", config.rt_upscaler_option},
             {"rt_upscaler_quality_option", config.rt_upscaler_quality_option},
             {"rt_upscaler_sharpness", config.rt_upscaler_sharpness},
@@ -149,6 +153,8 @@ namespace ultramodern {
         config.second_bounce_option = from_or_default(j, "second_bounce_option", second_bounce_default);
         config.advanced_water_option = from_or_default(j, "advanced_water_option", advanced_water_default);
         config.object_culling_option = from_or_default(j, "object_culling_option", object_culling_default);
+        config.volumetric_fog_option = from_or_default(j, "volumetric_fog_option", volumetric_fog_default);
+        config.god_rays_option = from_or_default(j, "god_rays_option", god_rays_default);
         config.rt_upscaler_option = from_or_default(j, "rt_upscaler_option", rt_upscaler_default);
         config.rt_upscaler_quality_option = from_or_default(j, "rt_upscaler_quality_option", rt_upscaler_quality_default);
         config.rt_upscaler_sharpness = std::clamp(from_or_default(j, "rt_upscaler_sharpness", rt_upscaler_sharpness_default), 0, 100);
@@ -399,6 +405,8 @@ void reset_graphics_options() {
     new_config.second_bounce_option = second_bounce_default;
     new_config.advanced_water_option = advanced_water_default;
     new_config.object_culling_option = object_culling_default;
+    new_config.volumetric_fog_option = volumetric_fog_default;
+    new_config.god_rays_option = god_rays_default;
     new_config.rt_upscaler_option = rt_upscaler_default;
     new_config.rt_upscaler_quality_option = rt_upscaler_quality_default;
     new_config.rt_upscaler_sharpness = rt_upscaler_sharpness_default;
