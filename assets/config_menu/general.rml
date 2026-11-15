@@ -38,9 +38,106 @@
                                 type="range"
                                 min="0"
                                 max="100"
-                                style="flex: 1; margin: 0dp; nav-down: #bg_input_enabled"
+                                style="flex: 1; margin: 0dp; nav-down: #camera_turn_speed_input"
                                 data-value="joystick_deadzone"
                             />
+                        </div>
+                    </div>
+
+                    <!-- camera stick -->
+                    <div class="config-option" data-event-mouseover="set_cur_config_index(8)">
+                        <label class="config-option__title">Camera Turn Speed</label>
+                        <div class="config-option__range-wrapper config-option__list">
+                            <label class="config-option__range-label">{{camera_turn_speed}}%</label>
+                            <input
+                                class="nav-vert"
+                                data-event-blur="set_cur_config_index(-1)"
+                                data-event-focus="set_cur_config_index(8)"
+                                id="camera_turn_speed_input"
+                                type="range"
+                                min="10"
+                                max="200"
+                                step="5"
+                                style="flex: 1; margin: 0dp;"
+                                data-value="camera_turn_speed"
+                            />
+                        </div>
+                    </div>
+
+                    <div class="config-option" data-event-mouseover="set_cur_config_index(9)">
+                        <label class="config-option__title">Camera Tilt Speed</label>
+                        <div class="config-option__range-wrapper config-option__list">
+                            <label class="config-option__range-label">{{camera_tilt_speed}}%</label>
+                            <input
+                                class="nav-vert"
+                                data-event-blur="set_cur_config_index(-1)"
+                                data-event-focus="set_cur_config_index(9)"
+                                id="camera_tilt_speed_input"
+                                type="range"
+                                min="10"
+                                max="200"
+                                step="5"
+                                style="flex: 1; margin: 0dp; nav-down: #camera_invert_turn_mode_on"
+                                data-value="camera_tilt_speed"
+                            />
+                        </div>
+                    </div>
+
+                    <div class="config-option" data-event-mouseover="set_cur_config_index(10)">
+                        <label class="config-option__title">Invert Camera Turn</label>
+                        <div class="config-option__list">
+                            <input
+                                type="radio"
+                                data-event-blur="set_cur_config_index(-1)"
+                                data-event-focus="set_cur_config_index(10)"
+                                name="camera_invert_turn_mode"
+                                data-checked="camera_invert_turn_mode"
+                                value="On"
+                                id="camera_invert_turn_mode_on"
+                                style="nav-up: #camera_tilt_speed_input; nav-down: #camera_invert_tilt_mode_on"
+                            />
+                            <label class="config-option__tab-label" for="camera_invert_turn_mode_on">On</label>
+
+                            <input
+                                type="radio"
+                                data-event-blur="set_cur_config_index(-1)"
+                                data-event-focus="set_cur_config_index(10)"
+                                name="camera_invert_turn_mode"
+                                data-checked="camera_invert_turn_mode"
+                                value="Off"
+                                id="camera_invert_turn_mode_off"
+                                style="nav-up: #camera_tilt_speed_input; nav-down: #camera_invert_tilt_mode_off"
+                            />
+                            <label class="config-option__tab-label" for="camera_invert_turn_mode_off">Off</label>
+                        </div>
+                    </div>
+
+                    <div class="config-option" data-event-mouseover="set_cur_config_index(11)">
+                        <label class="config-option__title">Invert Camera Tilt</label>
+                        <div class="config-option__list">
+                            <input
+                                type="radio"
+                                data-event-blur="set_cur_config_index(-1)"
+                                data-event-focus="set_cur_config_index(11)"
+                                name="camera_invert_tilt_mode"
+                                data-checked="camera_invert_tilt_mode"
+                                value="On"
+                                id="camera_invert_tilt_mode_on"
+                                style="nav-up: #camera_invert_turn_mode_on; nav-down: #bg_input_enabled"
+                            />
+                            <label class="config-option__tab-label" for="camera_invert_tilt_mode_on">On</label>
+
+                            <input
+                                type="radio"
+                                data-event-blur="set_cur_config_index(-1)"
+                                data-event-focus="set_cur_config_index(11)"
+                                name="camera_invert_tilt_mode"
+                                data-checked="camera_invert_tilt_mode"
+                                value="Off"
+                                id="camera_invert_tilt_mode_off"
+                                style="nav-up: #camera_invert_turn_mode_off; nav-down: #bg_input_disabled"
+                            />
+                            <label class="config-option__tab-label" for="camera_invert_tilt_mode_off">Off</label>
                         </div>
                     </div>
 
@@ -56,7 +153,7 @@
                                 data-checked="background_input_mode"
                                 value="On"
                                 id="bg_input_enabled"
-                                style="nav-up: #joystick_deadzone_input; nav-down: #film_grain_mode_on"
+                                style="nav-up: #camera_invert_tilt_mode_on; nav-down: #film_grain_mode_on"
                             />
                             <label class="config-option__tab-label" for="bg_input_enabled">On</label>
 
@@ -68,7 +165,7 @@
                                 data-checked="background_input_mode"
                                 value="Off"
                                 id="bg_input_disabled"
-                                style="nav-up: #joystick_deadzone_input; nav-down: #film_grain_mode_off"
+                                style="nav-up: #camera_invert_tilt_mode_off; nav-down: #film_grain_mode_off"
                             />
                             <label class="config-option__tab-label" for="bg_input_disabled">Off</label>
                         </div>
@@ -171,8 +268,17 @@
                     <p data-if="cur_config_index == 7">
                         Enables the path tracing debug keys. <b>F9</b> writes a diagnostics report for the pixel under the mouse cursor to rt.log, and <b>F10</b> cycles the debug views.
                     </p>
+                    <p data-if="cur_config_index == 8">
+                        How fast the camera stick turns the camera left and right, in the field and in battle. <b>100%</b> is the default. Modern controls only.
+                    </p>
                     <p data-if="cur_config_index == 9">
-                        Inverts the camera controls for the analog camera if it's enabled. <b>None</b> is the default.
+                        How fast the camera stick tilts the camera up and down, in the field and in battle. <b>100%</b> is the default. Modern controls only.
+                    </p>
+                    <p data-if="cur_config_index == 10">
+                        Reverses the camera stick's left and right: pushing right turns the view to the left. <b>Off</b> is the default. Modern controls only.
+                    </p>
+                    <p data-if="cur_config_index == 11">
+                        Reverses the camera stick's up and down: pushing up tilts the view down, like a flight stick. <b>Off</b> is the default. Modern controls only.
                     </p>
                 </div>
             </div>

@@ -468,15 +468,11 @@ const recomp::DefaultN64Mappings recomp::default_n64_keyboard_mappings = {
     .b = {
         {.input_type = (uint32_t)InputType::Keyboard, .input_id = SDL_SCANCODE_LSHIFT}
     },
-    .l = {
-        {.input_type = (uint32_t)InputType::Keyboard, .input_id = SDL_SCANCODE_E}
-    },
+    .l = {},
     .r = {
         {.input_type = (uint32_t)InputType::Keyboard, .input_id = SDL_SCANCODE_R}
     },
-    .z = {
-        {.input_type = (uint32_t)InputType::Keyboard, .input_id = SDL_SCANCODE_Q}
-    },
+    .z = {},
     .start = {
         {.input_type = (uint32_t)InputType::Keyboard, .input_id = SDL_SCANCODE_RETURN}
     },
@@ -492,18 +488,10 @@ const recomp::DefaultN64Mappings recomp::default_n64_keyboard_mappings = {
     .c_down = {
         {.input_type = (uint32_t)InputType::Keyboard, .input_id = SDL_SCANCODE_DOWN}
     },
-    .dpad_left = {
-        {.input_type = (uint32_t)InputType::Keyboard, .input_id = SDL_SCANCODE_J}
-    },
-    .dpad_right = {
-        {.input_type = (uint32_t)InputType::Keyboard, .input_id = SDL_SCANCODE_L}
-    },
-    .dpad_up = {
-        {.input_type = (uint32_t)InputType::Keyboard, .input_id = SDL_SCANCODE_I}
-    },
-    .dpad_down = {
-        {.input_type = (uint32_t)InputType::Keyboard, .input_id = SDL_SCANCODE_K}
-    },
+    .dpad_left = {},
+    .dpad_right = {},
+    .dpad_up = {},
+    .dpad_down = {},
     .analog_left = {
         {.input_type = (uint32_t)InputType::Keyboard, .input_id = SDL_SCANCODE_A}
     },
@@ -526,15 +514,122 @@ const recomp::DefaultN64Mappings recomp::default_n64_keyboard_mappings = {
         {.input_type = (uint32_t)InputType::Keyboard, .input_id = SDL_SCANCODE_F}
     },
     // Sprint stays off the keyboard. WASD and the arrow keys are already walk and spirits.
-    .sprint = {}
+    .sprint = {},
+    .camera_target = {
+        {.input_type = (uint32_t)InputType::Keyboard, .input_id = SDL_SCANCODE_Z}
+    },
+    .camera_zoom = {
+        {.input_type = (uint32_t)InputType::Keyboard, .input_id = SDL_SCANCODE_C}
+    },
+    .page_prev = {
+        {.input_type = (uint32_t)InputType::Keyboard, .input_id = SDL_SCANCODE_Q}
+    },
+    .page_next = {
+        {.input_type = (uint32_t)InputType::Keyboard, .input_id = SDL_SCANCODE_E}
+    },
+    .camera_left = {
+        {.input_type = (uint32_t)InputType::Keyboard, .input_id = SDL_SCANCODE_J}
+    },
+    .camera_right = {
+        {.input_type = (uint32_t)InputType::Keyboard, .input_id = SDL_SCANCODE_L}
+    },
+    .camera_up = {
+        {.input_type = (uint32_t)InputType::Keyboard, .input_id = SDL_SCANCODE_I}
+    },
+    .camera_down = {
+        {.input_type = (uint32_t)InputType::Keyboard, .input_id = SDL_SCANCODE_K}
+    },
 };
 
-// Dreamcast pad, in SDL's standard layout (A south, B east, Y north, X west).
+// Modern controls, in SDL's standard layout (A south, B east, Y north, X west).
+// The D-pad is the C buttons and the right stick is the camera.
+const recomp::DefaultN64Mappings recomp::default_n64_controller_mappings = {
+    .a = {
+        {.input_type = (uint32_t)InputType::ControllerDigital, .input_id = SDL_CONTROLLER_BUTTON_SOUTH},
+    },
+    .b = {
+        {.input_type = (uint32_t)InputType::ControllerDigital, .input_id = SDL_CONTROLLER_BUTTON_EAST},
+    },
+    .l = {},
+    .r = {
+        {.input_type = (uint32_t)InputType::ControllerDigital, .input_id = SDL_CONTROLLER_BUTTON_WEST},
+    },
+    .z = {},
+    .start = {
+        {.input_type = (uint32_t)InputType::ControllerDigital, .input_id = SDL_CONTROLLER_BUTTON_START},
+    },
+    .c_left = {
+        {.input_type = (uint32_t)InputType::ControllerDigital, .input_id = SDL_CONTROLLER_BUTTON_DPAD_LEFT},
+    },
+    .c_right = {
+        {.input_type = (uint32_t)InputType::ControllerDigital, .input_id = SDL_CONTROLLER_BUTTON_DPAD_RIGHT},
+    },
+    .c_up = {
+        {.input_type = (uint32_t)InputType::ControllerDigital, .input_id = SDL_CONTROLLER_BUTTON_DPAD_UP},
+    },
+    .c_down = {
+        {.input_type = (uint32_t)InputType::ControllerDigital, .input_id = SDL_CONTROLLER_BUTTON_DPAD_DOWN},
+    },
+    .dpad_left = {},
+    .dpad_right = {},
+    .dpad_up = {},
+    .dpad_down = {},
+    .analog_left = {
+        {.input_type = (uint32_t)InputType::ControllerAnalog, .input_id = -(SDL_CONTROLLER_AXIS_LEFTX + 1)},
+    },
+    .analog_right = {
+        {.input_type = (uint32_t)InputType::ControllerAnalog, .input_id = SDL_CONTROLLER_AXIS_LEFTX + 1},
+    },
+    .analog_up = {
+        {.input_type = (uint32_t)InputType::ControllerAnalog, .input_id = -(SDL_CONTROLLER_AXIS_LEFTY + 1)},
+    },
+    .analog_down = {
+        {.input_type = (uint32_t)InputType::ControllerAnalog, .input_id = SDL_CONTROLLER_AXIS_LEFTY + 1},
+    },
+    .toggle_menu = {
+        {.input_type = (uint32_t)InputType::ControllerDigital, .input_id = SDL_CONTROLLER_BUTTON_BACK},
+    },
+    .accept_menu = {
+        {.input_type = (uint32_t)InputType::ControllerDigital, .input_id = SDL_CONTROLLER_BUTTON_SOUTH},
+    },
+    .apply_menu = {
+        {.input_type = (uint32_t)InputType::ControllerDigital, .input_id = SDL_CONTROLLER_BUTTON_START}
+    },
+    .sprint = {
+        {.input_type = (uint32_t)InputType::ControllerDigital, .input_id = SDL_CONTROLLER_BUTTON_NORTH},
+    },
+    .camera_target = {
+        {.input_type = (uint32_t)InputType::ControllerAnalog, .input_id = SDL_CONTROLLER_AXIS_TRIGGERLEFT + 1},
+    },
+    .camera_zoom = {
+        {.input_type = (uint32_t)InputType::ControllerDigital, .input_id = SDL_CONTROLLER_BUTTON_LEFTSHOULDER},
+    },
+    .page_prev = {
+        {.input_type = (uint32_t)InputType::ControllerDigital, .input_id = SDL_CONTROLLER_BUTTON_LEFTSHOULDER},
+    },
+    .page_next = {
+        {.input_type = (uint32_t)InputType::ControllerDigital, .input_id = SDL_CONTROLLER_BUTTON_RIGHTSHOULDER},
+    },
+    .camera_left = {
+        {.input_type = (uint32_t)InputType::ControllerAnalog, .input_id = -(SDL_CONTROLLER_AXIS_RIGHTX + 1)},
+    },
+    .camera_right = {
+        {.input_type = (uint32_t)InputType::ControllerAnalog, .input_id = SDL_CONTROLLER_AXIS_RIGHTX + 1},
+    },
+    .camera_up = {
+        {.input_type = (uint32_t)InputType::ControllerAnalog, .input_id = -(SDL_CONTROLLER_AXIS_RIGHTY + 1)},
+    },
+    .camera_down = {
+        {.input_type = (uint32_t)InputType::ControllerAnalog, .input_id = SDL_CONTROLLER_AXIS_RIGHTY + 1},
+    },
+};
+
+// Classic controls. Dreamcast pad, in SDL's standard layout (A south, B east, Y north, X west).
 // X is sprint, N64 button bit 0x0040, and is not mapped to any other N64 button.
 // The N64 D-pad is unused: the Dreamcast D-pad is the C buttons. Triggers are
 // the SDL trigger axes, which is how Dreamcast L and R are mapped. The shoulder
 // buttons are a second binding for adapters that report those triggers as buttons.
-const recomp::DefaultN64Mappings recomp::default_n64_controller_mappings = {
+const recomp::DefaultN64Mappings recomp::classic_n64_controller_mappings = {
     .a = {
         {.input_type = (uint32_t)InputType::ControllerDigital, .input_id = SDL_CONTROLLER_BUTTON_SOUTH},
     },
@@ -595,6 +690,74 @@ const recomp::DefaultN64Mappings recomp::default_n64_controller_mappings = {
     .sprint = {
         {.input_type = (uint32_t)InputType::ControllerDigital, .input_id = SDL_CONTROLLER_BUTTON_X},
     }
+};
+
+const recomp::DefaultN64Mappings recomp::classic_n64_keyboard_mappings = {
+    .a = {
+        {.input_type = (uint32_t)InputType::Keyboard, .input_id = SDL_SCANCODE_SPACE}
+    },
+    .b = {
+        {.input_type = (uint32_t)InputType::Keyboard, .input_id = SDL_SCANCODE_LSHIFT}
+    },
+    .l = {
+        {.input_type = (uint32_t)InputType::Keyboard, .input_id = SDL_SCANCODE_E}
+    },
+    .r = {
+        {.input_type = (uint32_t)InputType::Keyboard, .input_id = SDL_SCANCODE_R}
+    },
+    .z = {
+        {.input_type = (uint32_t)InputType::Keyboard, .input_id = SDL_SCANCODE_Q}
+    },
+    .start = {
+        {.input_type = (uint32_t)InputType::Keyboard, .input_id = SDL_SCANCODE_RETURN}
+    },
+    .c_left = {
+        {.input_type = (uint32_t)InputType::Keyboard, .input_id = SDL_SCANCODE_LEFT}
+    },
+    .c_right = {
+        {.input_type = (uint32_t)InputType::Keyboard, .input_id = SDL_SCANCODE_RIGHT}
+    },
+    .c_up = {
+        {.input_type = (uint32_t)InputType::Keyboard, .input_id = SDL_SCANCODE_UP}
+    },
+    .c_down = {
+        {.input_type = (uint32_t)InputType::Keyboard, .input_id = SDL_SCANCODE_DOWN}
+    },
+    .dpad_left = {
+        {.input_type = (uint32_t)InputType::Keyboard, .input_id = SDL_SCANCODE_J}
+    },
+    .dpad_right = {
+        {.input_type = (uint32_t)InputType::Keyboard, .input_id = SDL_SCANCODE_L}
+    },
+    .dpad_up = {
+        {.input_type = (uint32_t)InputType::Keyboard, .input_id = SDL_SCANCODE_I}
+    },
+    .dpad_down = {
+        {.input_type = (uint32_t)InputType::Keyboard, .input_id = SDL_SCANCODE_K}
+    },
+    .analog_left = {
+        {.input_type = (uint32_t)InputType::Keyboard, .input_id = SDL_SCANCODE_A}
+    },
+    .analog_right = {
+        {.input_type = (uint32_t)InputType::Keyboard, .input_id = SDL_SCANCODE_D}
+    },
+    .analog_up = {
+        {.input_type = (uint32_t)InputType::Keyboard, .input_id = SDL_SCANCODE_W}
+    },
+    .analog_down = {
+        {.input_type = (uint32_t)InputType::Keyboard, .input_id = SDL_SCANCODE_S}
+    },
+    .toggle_menu = {
+        {.input_type = (uint32_t)InputType::Keyboard, .input_id = SDL_SCANCODE_ESCAPE}
+    },
+    .accept_menu = {
+        {.input_type = (uint32_t)InputType::Keyboard, .input_id = SDL_SCANCODE_RETURN}
+    },
+    .apply_menu = {
+        {.input_type = (uint32_t)InputType::Keyboard, .input_id = SDL_SCANCODE_F}
+    },
+    // Sprint stays off the keyboard. WASD and the arrow keys are already walk and spirits.
+    .sprint = {}
 };
 
 void recomp::poll_inputs() {
@@ -1052,6 +1215,15 @@ std::string controller_axis_to_string(int axis) {
     default:
         return "Axis " + std::to_string(actual_axis) + (positive ? '+' : '-');
     }
+}
+
+recomp::InputField recomp::controller_button_field(int sdl_button) {
+    return recomp::InputField{.input_type = (uint32_t)InputType::ControllerDigital, .input_id = sdl_button};
+}
+
+recomp::InputField recomp::controller_axis_field(int sdl_axis, bool positive) {
+    int32_t id = sdl_axis + 1;
+    return recomp::InputField{.input_type = (uint32_t)InputType::ControllerAnalog, .input_id = positive ? id : -id};
 }
 
 std::string recomp::InputField::to_string() const {

@@ -18,6 +18,17 @@ DECLARE_FUNC(s32, recomp_get_invert_y_axis_mode);
 DECLARE_FUNC(s32, recomp_get_radio_comm_box_mode);
 DECLARE_FUNC(void, recomp_get_analog_inverted_axes, s32* x, s32* y);
 DECLARE_FUNC(void, recomp_get_camera_inputs, float* x, float* y);
+DECLARE_FUNC(void, recomp_get_camera_speed, float* turn, float* tilt);
+DECLARE_FUNC(s32, recomp_get_controls_style);
 DECLARE_FUNC(void, recomp_set_right_analog_suppressed, s32 suppressed);
+
+// Matches recomp::GameAction.
+typedef enum {
+    RECOMP_ACTION_CAMERA_TARGET = 0,
+    RECOMP_ACTION_CAMERA_ZOOM = 1,
+    RECOMP_ACTION_PAGE_PREV = 2,
+    RECOMP_ACTION_PAGE_NEXT = 3,
+} RecompAction;
+DECLARE_FUNC(float, recomp_get_action_input, u32 action);
 
 #endif

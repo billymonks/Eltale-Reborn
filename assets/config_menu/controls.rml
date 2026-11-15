@@ -19,6 +19,23 @@
                             <div class="toggle__icon toggle__icon--right"><div>␽</div></div>
                         </div>
                     </button>
+                    <!-- Controls style -->
+                    <div class="controls-style" data-if="!input_device_is_keyboard">
+                        <button
+                            id="controls_style_modern"
+                            class="controls-style__tab"
+                            data-class-controls-style__tab--active="controls_style == 'Modern'"
+                            data-event-click="set_controls_style('Modern')"
+                            style="nav-up: #tab_controls; nav-down: #input_row_button_0_0"
+                        >Modern controls</button>
+                        <button
+                            id="controls_style_classic"
+                            class="controls-style__tab"
+                            data-class-controls-style__tab--active="controls_style == 'Classic'"
+                            data-event-click="set_controls_style('Classic')"
+                            style="nav-up: #tab_controls; nav-down: #input_row_button_0_0"
+                        >Classic controls</button>
+                    </div>
                 </div>
                 <div>
                     <button
@@ -41,7 +58,7 @@
                                     data-for="input_bindings, i : inputs.array"
                                     data-event-mouseover="set_input_row_focus(i)"
                                     data-class-control-option--active="get_input_enum_name(i)==cur_input_row"
-                                    data-if="get_input_enum_name(i) != 'DPAD_UP' && get_input_enum_name(i) != 'DPAD_DOWN' && get_input_enum_name(i) != 'DPAD_LEFT' && get_input_enum_name(i) != 'DPAD_RIGHT' && (!input_device_is_keyboard || (get_input_enum_name(i) != 'TOGGLE_MENU' && get_input_enum_name(i) != 'ACCEPT_MENU' && get_input_enum_name(i) != 'APPLY_MENU'))"
+                                    data-if="input_row_visible(i, controls_style, input_device_is_keyboard)"
                                 >
                                     <label
                                         class="control-option__label"
@@ -90,157 +107,89 @@
                             </div>
                         </div>
                     </div>
-                    <div class="input-config__visual-wrapper">
-                        <div class="input-config__visual-aspect">
-                            <div class="input-config__visual dc-pad">
-                                <div class="dc-pad__shoulders">
-                                    <div class="dc-shoulder">
-                                        <div class="dc-shoulder__name">L</div>
-                                        <div class="input-viz dc-trigger" visual-input="L">
-                                            <div class="input-viz__mappings">
-                                                <div class="input-config__visual-mapping" data-for="cur_binding, i : inputs.L">
-                                                    <div>{{cur_binding}}</div>
-                                                </div>
-                                            </div>
-                                        </div>
+                    <!-- Pad map -->
+                    <div class="pad-map" data-if="!input_device_is_keyboard">
+                        <div class="pad-map__top">
+                            <div class="pad-map__side">
+                                <div class="pad-map__row pad-map__row--left" data-for="row : inputs.pad.left" data-class-pad-map__row--lit="row.lit">
+                                    <div class="pad-map__actions">
+                                        <div data-for="line : row.lines">{{line.text}}</div>
+                                        <div class="pad-map__none" data-if="row.lines.size == 0">--</div>
                                     </div>
-                                    <div class="dc-shoulder">
-                                        <div class="dc-shoulder__name">R</div>
-                                        <div class="input-viz dc-trigger dc-trigger--right" visual-input="Z">
-                                            <div class="input-viz__mappings">
-                                                <div class="input-config__visual-mapping" data-for="cur_binding, i : inputs.Z">
-                                                    <div>{{cur_binding}}</div>
-                                                </div>
-                                            </div>
-                                        </div>
+                                    <div class="pad-map__glyph" data-class-pad-map__glyph--text="row.glyph_is_text">{{row.glyph}}</div>
+                                </div>
+                            </div>
+                            <div class="pad-map__drawing">
+                                <div class="pad-map__drawing-aspect">
+                                    <svg class="pad-map__outline" src="icons/VizMap/ModernPad.svg" />
+                                    <svg class="pad-map__lit" src="icons/VizMap/ModernPad_lt.svg" data-if="inputs.pad.spots.lt" />
+                                    <svg class="pad-map__lit" src="icons/VizMap/ModernPad_rt.svg" data-if="inputs.pad.spots.rt" />
+                                    <svg class="pad-map__lit" src="icons/VizMap/ModernPad_lb.svg" data-if="inputs.pad.spots.lb" />
+                                    <svg class="pad-map__lit" src="icons/VizMap/ModernPad_rb.svg" data-if="inputs.pad.spots.rb" />
+                                    <svg class="pad-map__lit" src="icons/VizMap/ModernPad_view.svg" data-if="inputs.pad.spots.view" />
+                                    <svg class="pad-map__lit" src="icons/VizMap/ModernPad_menu.svg" data-if="inputs.pad.spots.menu" />
+                                    <svg class="pad-map__lit" src="icons/VizMap/ModernPad_dpad_up.svg" data-if="inputs.pad.spots.dpad_up" />
+                                    <svg class="pad-map__lit" src="icons/VizMap/ModernPad_dpad_down.svg" data-if="inputs.pad.spots.dpad_down" />
+                                    <svg class="pad-map__lit" src="icons/VizMap/ModernPad_dpad_left.svg" data-if="inputs.pad.spots.dpad_left" />
+                                    <svg class="pad-map__lit" src="icons/VizMap/ModernPad_dpad_right.svg" data-if="inputs.pad.spots.dpad_right" />
+                                    <svg class="pad-map__lit" src="icons/VizMap/ModernPad_ls.svg" data-if="inputs.pad.spots.ls" />
+                                    <svg class="pad-map__lit" src="icons/VizMap/ModernPad_l3.svg" data-if="inputs.pad.spots.l3" />
+                                    <svg class="pad-map__lit" src="icons/VizMap/ModernPad_rs.svg" data-if="inputs.pad.spots.rs" />
+                                    <svg class="pad-map__lit" src="icons/VizMap/ModernPad_r3.svg" data-if="inputs.pad.spots.r3" />
+                                    <svg class="pad-map__lit" src="icons/VizMap/ModernPad_y.svg" data-if="inputs.pad.spots.y" />
+                                    <svg class="pad-map__lit" src="icons/VizMap/ModernPad_x.svg" data-if="inputs.pad.spots.x" />
+                                    <svg class="pad-map__lit" src="icons/VizMap/ModernPad_b.svg" data-if="inputs.pad.spots.b" />
+                                    <svg class="pad-map__lit" src="icons/VizMap/ModernPad_a.svg" data-if="inputs.pad.spots.a" />
+                                </div>
+                            </div>
+                            <div class="pad-map__side">
+                                <div class="pad-map__row pad-map__row--right" data-for="row : inputs.pad.right" data-class-pad-map__row--lit="row.lit">
+                                    <div class="pad-map__glyph" data-class-pad-map__glyph--text="row.glyph_is_text">{{row.glyph}}</div>
+                                    <div class="pad-map__actions">
+                                        <div data-for="line : row.lines">{{line.text}}</div>
+                                        <div class="pad-map__none" data-if="row.lines.size == 0">--</div>
                                     </div>
                                 </div>
-                                <div class="dc-pad__body">
-                                    <div class="dc-pad__left">
-                                        <div
-                                            class="input-viz input-config__visual-stick dc-pad__stick"
-                                            visual-input="X_AXIS_NEG X_AXIS_POS Y_AXIS_NEG Y_AXIS_POS"
-                                        >
-                                            <div class="input-viz__stick-split input-viz__stick-split--vertical">
-                                                <div class="input-viz input-viz__mappings" visual-input="Y_AXIS_POS">
-                                                    <svg class="input-viz__dpad-arrow input-viz__dpad-arrow--up" src="icons/VizMap/DPadArrow.svg" />
-                                                    <div class="input-config__visual-mapping" data-for="cur_binding, i : inputs.Y_AXIS_POS">
-                                                        <div>{{cur_binding}}</div>
-                                                    </div>
-                                                </div>
-                                                <div class="input-viz__dpad-divider" />
-                                                <div class="input-viz input-viz__mappings" visual-input="Y_AXIS_NEG">
-                                                    <svg class="input-viz__dpad-arrow input-viz__dpad-arrow--down" src="icons/VizMap/DPadArrow.svg" />
-                                                    <div class="input-config__visual-mapping" data-for="cur_binding, i : inputs.Y_AXIS_NEG">
-                                                        <div>{{cur_binding}}</div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="input-viz__stick-split input-viz__stick-split--horizontal">
-                                                <div class="input-viz input-viz__mappings" visual-input="X_AXIS_NEG">
-                                                    <svg class="input-viz__dpad-arrow input-viz__dpad-arrow--left" src="icons/VizMap/DPadArrow.svg" />
-                                                    <div class="input-config__visual-mapping" data-for="cur_binding, i : inputs.X_AXIS_NEG">
-                                                        <div>{{cur_binding}}</div>
-                                                    </div>
-                                                </div>
-                                                <div class="input-viz__dpad-divider" />
-                                                <div class="input-viz input-viz__mappings" visual-input="X_AXIS_POS">
-                                                    <svg class="input-viz__dpad-arrow input-viz__dpad-arrow--right" src="icons/VizMap/DPadArrow.svg" />
-                                                    <div class="input-config__visual-mapping" data-for="cur_binding, i : inputs.X_AXIS_POS">
-                                                        <div>{{cur_binding}}</div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div
-                                            class="input-viz input-viz__dpad dc-pad__dpad"
-                                            visual-input="C_UP C_DOWN C_LEFT C_RIGHT"
-                                        >
-                                            <svg src="icons/VizMap/DPad.svg" />
-                                            <div class="input-viz__dpad-split input-viz__dpad-split--vertical">
-                                                <div class="input-viz input-viz__mappings" visual-input="C_UP">
-                                                    <svg class="input-viz__dpad-arrow input-viz__dpad-arrow--up" src="icons/VizMap/DPadArrow.svg" />
-                                                    <div class="input-config__visual-mapping" data-for="cur_binding, i : inputs.C_UP">
-                                                        <div>{{cur_binding}}</div>
-                                                    </div>
-                                                </div>
-                                                <div class="input-viz__dpad-divider" />
-                                                <div class="input-viz input-viz__mappings" visual-input="C_DOWN">
-                                                    <svg class="input-viz__dpad-arrow input-viz__dpad-arrow--down" src="icons/VizMap/DPadArrow.svg" />
-                                                    <div class="input-config__visual-mapping" data-for="cur_binding, i : inputs.C_DOWN">
-                                                        <div>{{cur_binding}}</div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="input-viz__dpad-split input-viz__dpad-split--horizontal">
-                                                <div class="input-viz input-viz__mappings" visual-input="C_LEFT">
-                                                    <svg class="input-viz__dpad-arrow input-viz__dpad-arrow--left" src="icons/VizMap/DPadArrow.svg" />
-                                                    <div class="input-config__visual-mapping" data-for="cur_binding, i : inputs.C_LEFT">
-                                                        <div>{{cur_binding}}</div>
-                                                    </div>
-                                                </div>
-                                                <div class="input-viz__dpad-divider" />
-                                                <div class="input-viz input-viz__mappings" visual-input="C_RIGHT">
-                                                    <svg class="input-viz__dpad-arrow input-viz__dpad-arrow--right" src="icons/VizMap/DPadArrow.svg" />
-                                                    <div class="input-config__visual-mapping" data-for="cur_binding, i : inputs.C_RIGHT">
-                                                        <div>{{cur_binding}}</div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                            </div>
+                        </div>
+                        <div class="pad-map__sections">
+                            <div class="pad-map__section">
+                                <div class="pad-map__heading">LEFT STICK</div>
+                                <div class="pad-map__row pad-map__row--right" data-for="row : inputs.pad.left_stick" data-class-pad-map__row--lit="row.lit">
+                                    <div class="pad-map__glyph" data-class-pad-map__glyph--text="row.glyph_is_text">{{row.glyph}}</div>
+                                    <div class="pad-map__actions">
+                                        <div data-for="line : row.lines">{{line.text}}</div>
+                                        <div class="pad-map__none" data-if="row.lines.size == 0">--</div>
                                     </div>
-                                    <div class="dc-pad__start">
-                                        <div
-                                            class="input-viz input-viz__button input-viz__button--sm input-viz__button--Start"
-                                            visual-input="START"
-                                        >
-                                            <svg src="icons/VizMap/ButtonSmall.svg" />
-                                            <div class="input-viz__mappings">
-                                                <div class="input-config__visual-mapping" data-for="cur_binding, i : inputs.START">
-                                                    <div>{{cur_binding}}</div>
-                                                </div>
-                                            </div>
-                                        </div>
+                                </div>
+                            </div>
+                            <div class="pad-map__section">
+                                <div class="pad-map__heading">DIRECTIONAL PAD</div>
+                                <div class="pad-map__row pad-map__row--right" data-for="row : inputs.pad.dpad" data-class-pad-map__row--lit="row.lit">
+                                    <div class="pad-map__glyph" data-class-pad-map__glyph--text="row.glyph_is_text">{{row.glyph}}</div>
+                                    <div class="pad-map__actions">
+                                        <div data-for="line : row.lines">{{line.text}}</div>
+                                        <div class="pad-map__none" data-if="row.lines.size == 0">--</div>
                                     </div>
-                                    <div class="dc-pad__face">
-                                        <div class="dc-face">
-                                            <div class="dc-face__lr">
-                                                <div class="input-viz input-viz__button input-viz__button--lg dc-btn dc-btn--x" visual-input="SPRINT">
-                                                    <svg src="icons/VizMap/ButtonLarge.svg" />
-                                                    <div class="input-viz__mappings">
-                                                        <div class="input-config__visual-mapping" data-for="cur_binding, i : inputs.SPRINT">
-                                                            <div>{{cur_binding}}</div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="input-viz input-viz__button input-viz__button--lg dc-btn dc-btn--b" visual-input="B">
-                                                    <svg src="icons/VizMap/ButtonLarge.svg" />
-                                                    <div class="input-viz__mappings">
-                                                        <div class="input-config__visual-mapping" data-for="cur_binding, i : inputs.B">
-                                                            <div>{{cur_binding}}</div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="dc-face__du">
-                                                <div class="input-viz input-viz__button input-viz__button--lg dc-btn dc-btn--a" visual-input="A">
-                                                    <svg src="icons/VizMap/ButtonLarge.svg" />
-                                                    <div class="input-viz__mappings">
-                                                        <div class="input-config__visual-mapping" data-for="cur_binding, i : inputs.A">
-                                                            <div>{{cur_binding}}</div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="input-viz input-viz__button input-viz__button--lg dc-btn dc-btn--y" visual-input="R">
-                                                    <svg src="icons/VizMap/ButtonLarge.svg" />
-                                                    <div class="input-viz__mappings">
-                                                        <div class="input-config__visual-mapping" data-for="cur_binding, i : inputs.R">
-                                                            <div>{{cur_binding}}</div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                                </div>
+                            </div>
+                            <div class="pad-map__section">
+                                <div class="pad-map__heading">RIGHT STICK</div>
+                                <div class="pad-map__row pad-map__row--right" data-for="row : inputs.pad.right_stick" data-class-pad-map__row--lit="row.lit">
+                                    <div class="pad-map__glyph" data-class-pad-map__glyph--text="row.glyph_is_text">{{row.glyph}}</div>
+                                    <div class="pad-map__actions">
+                                        <div data-for="line : row.lines">{{line.text}}</div>
+                                        <div class="pad-map__none" data-if="row.lines.size == 0">--</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="pad-map__section">
+                                <div class="pad-map__heading">FACE BUTTONS</div>
+                                <div class="pad-map__row pad-map__row--right" data-for="row : inputs.pad.face" data-class-pad-map__row--lit="row.lit">
+                                    <div class="pad-map__glyph" data-class-pad-map__glyph--text="row.glyph_is_text">{{row.glyph}}</div>
+                                    <div class="pad-map__actions">
+                                        <div data-for="line : row.lines">{{line.text}}</div>
+                                        <div class="pad-map__none" data-if="row.lines.size == 0">--</div>
                                     </div>
                                 </div>
                             </div>
