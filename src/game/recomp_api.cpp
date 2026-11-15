@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <cmath>
 
 #include "recomp.h"
@@ -175,10 +176,16 @@ extern "C" void recomp_get_analog_inverted_axes(uint8_t* rdram, recomp_context* 
     s32* x_out = _arg<0, s32*>(rdram, ctx);
     s32* y_out = _arg<1, s32*>(rdram, ctx);
 
-    zelda64::AimInvertMode mode = zelda64::get_analog_camera_invert_mode();
+    *x_out = zelda64::get_camera_invert_turn_mode() == zelda64::AimInvertMode::On;
+    *y_out = zelda64::get_camera_invert_tilt_mode() == zelda64::AimInvertMode::On;
+}
 
-    // *x_out = (mode == zelda64::AimInvertMode::InvertX || mode == zelda64::AimInvertMode::InvertBoth);
-    // *y_out = (mode == zelda64::AimInvertMode::InvertY || mode == zelda64::AimInvertMode::InvertBoth);
+extern "C" void recomp_get_camera_speed(uint8_t* rdram, recomp_context* ctx) {
+    float* turn_out = _arg<0, float*>(rdram, ctx);
+    float* tilt_out = _arg<1, float*>(rdram, ctx);
+
+    *turn_out = std::clamp(recomp::get_camera_turn_speed(), 10, 200) / 100.0f;
+    *tilt_out = std::clamp(recomp::get_camera_tilt_speed(), 10, 200) / 100.0f;
 }
 
 extern "C" void recomp_get_invert_y_axis_mode(uint8_t* rdram, recomp_context* ctx) {
@@ -194,7 +201,7 @@ extern "C" void recomp_get_camera_inputs(uint8_t* rdram, recomp_context* ctx) {
 
     float x, y;
 
-    recomp::get_right_analog(&x, &y);
+    recomp::get_camera_stick(&x, &y);
 
     float magnitude = sqrtf(x * x + y * y);
 
@@ -205,10 +212,55 @@ extern "C" void recomp_get_camera_inputs(uint8_t* rdram, recomp_context* ctx) {
     else {
         float x_normalized = x / magnitude;
         float y_normalized = y / magnitude;
+        // Stick corners and keyboard diagonals can go past 1.
+        float scaled = std::min((magnitude - radial_deadzone) / (1 - radial_deadzone), 1.0f);
 
-        *x_out = x_normalized * ((magnitude - radial_deadzone) / (1 - radial_deadzone));
-        *y_out = y_normalized * ((magnitude - radial_deadzone) / (1 - radial_deadzone));
+        *x_out = x_normalized * scaled;
+        *y_out = y_normalized * scaled;
     }
+    if (zelda64::get_camera_invert_turn_mode() == zelda64::AimInvertMode::On) {
+        *x_out = -*x_out;
+    }
+    if (zelda64::get_camera_invert_tilt_mode() == zelda64::AimInvertMode::On) {
+        *y_out = -*y_out;
+    }
+}
+
+// Modern controls' page actions become N64 Z/R in the Start menu and L/Z in the item menu, and do nothing elsewhere.
+extern "C" unsigned int recomp_menu_page_buttons(uint8_t* rdram, unsigned int buttons) {
+    constexpr int32_t game_mode_addr = (int32_t)0x8007B2E0;
+    constexpr int32_t game_state_addr = (int32_t)0x8007B2E4;
+    constexpr uint16_t mode_paused = 2;
+    constexpr uint32_t game_state_item_menu = 0x01;
+    if (recomp::get_controls_style() != recomp::ControlsStyle::Modern) {
+        return buttons & 0xFFFF;
+    }
+    uint16_t game_mode = MEM_HU(0, (gpr)game_mode_addr);
+    uint32_t game_state = (uint32_t)MEM_W(0, (gpr)game_state_addr);
+    bool next = recomp::get_action_input(recomp::GameAction::PageNext) > 0.5f;
+    bool prev = recomp::get_action_input(recomp::GameAction::PagePrev) > 0.5f;
+    if (game_mode == mode_paused) {
+        buttons &= ~(0x0010u | 0x2000u);
+        buttons |= (next ? 0x0010 : 0) | (prev ? 0x2000 : 0);   // R, Z
+    }
+    else if (game_state & game_state_item_menu) {
+        buttons |= (next ? 0x2000 : 0) | (prev ? 0x0020 : 0);   // Z, L
+    }
+    return buttons & 0xFFFF;
+}
+
+// 0 Classic, 1 Modern.
+extern "C" void recomp_get_controls_style(uint8_t* rdram, recomp_context* ctx) {
+    _return<s32>(ctx, recomp::get_controls_style() == recomp::ControlsStyle::Modern ? 1 : 0);
+}
+
+extern "C" void recomp_get_action_input(uint8_t* rdram, recomp_context* ctx) {
+    u32 action = _arg<0, u32>(rdram, ctx);
+    float value = 0.0f;
+    if (action < static_cast<u32>(recomp::GameAction::Count)) {
+        value = recomp::get_action_input(static_cast<recomp::GameAction>(action));
+    }
+    _return(ctx, value);
 }
 
 extern "C" void recomp_set_right_analog_suppressed(uint8_t* rdram, recomp_context* ctx) {

@@ -32,6 +32,12 @@ func = "dma_write"
 text = "load_overlays(ctx->r4, ctx->r5, ctx->r6);"
 before_vram = 0x80024260
 
+# The controller read has just loaded the buttons into $v1. Modern controls map the page actions onto them here.
+[[patches.hook]]
+func = "func_800314C0"
+text = "unsigned int recomp_menu_page_buttons(unsigned char* rdram, unsigned int buttons); ctx->r3 = recomp_menu_page_buttons(rdram, (unsigned int)(ctx->r3 & 0xFFFF));"
+before_vram = 0x80031528
+
 # Rumble follows a sound effect as it actually starts. Delay 0 plays here ($a0 the id,
 # $a3 the scaled volume). A delayed effect waits in func_80026658 and starts with $a0 the id.
 [[patches.hook]]

@@ -1,0 +1,23 @@
+<svg width="400" height="312" viewBox="0 0 400 312" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M 118 54 C 150 46, 250 46, 282 54 C 330 60, 356 78, 368 112 C 386 150, 392 220, 384 268 C 378 298, 346 310, 326 292 C 310 278, 296 248, 278 238 C 256 228, 144 228, 122 238 C 104 248, 90 278, 74 292 C 54 310, 22 298, 16 268 C 8 220, 14 150, 32 112 C 44 78, 70 60, 118 54 Z" fill="#FFFFFF" fill-opacity="0.04" stroke="#FFFFFF" stroke-width="3.5" stroke-linejoin="round"/>
+    <rect x="70" y="4" width="60" height="24" rx="10" stroke="#FFFFFF" stroke-width="3"/>
+    <rect x="270" y="4" width="60" height="24" rx="10" stroke="#FFFFFF" stroke-width="3"/>
+    <rect x="58" y="34" width="86" height="13" rx="6.5" stroke="#FFFFFF" stroke-width="3"/>
+    <rect x="256" y="34" width="86" height="13" rx="6.5" stroke="#FFFFFF" stroke-width="3"/>
+    <rect x="168" y="98" width="20" height="12" rx="6" stroke="#FFFFFF" stroke-width="3"/>
+    <rect x="212" y="98" width="20" height="12" rx="6" stroke="#FFFFFF" stroke-width="3"/>
+    <path d="M 142 152 h 20 v 16 h 16 v 20 h -16 v 16 h -20 v -16 h -16 v -20 h 16 Z" stroke="#FFFFFF" stroke-width="3" stroke-linejoin="round"/>
+    <circle cx="112" cy="112" r="25" stroke="#FFFFFF" stroke-width="3"/>
+    <circle cx="112" cy="112" r="15" stroke="#FFFFFF" stroke-width="2.5"/>
+    <circle cx="248" cy="178" r="25" stroke="#FFFFFF" stroke-width="3"/>
+    <circle cx="248" cy="178" r="15" stroke="#FFFFFF" stroke-width="2.5"/>
+    <circle cx="288" cy="88" r="12" stroke="#FFFFFF" stroke-width="2.5"/>
+    <path d="M 283.5 82.5 L 288 88 L 292.5 82.5 M 288 88 V 93.5" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="264" cy="112" r="12" stroke="#FFFFFF" stroke-width="2.5"/>
+    <path d="M 260 106.5 L 268 117.5 M 268 106.5 L 260 117.5" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="312" cy="112" r="12" stroke="#FFFFFF" stroke-width="2.5"/>
+    <path d="M 308.5 106.5 V 117.5 H 312.8 A 2.75 2.75 0 0 0 312.8 112 H 308.5 M 308.5 112 H 312.2 A 2.75 2.75 0 0 0 312.2 106.5 H 308.5" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="288" cy="136" r="12" stroke="#FFFFFF" stroke-width="2.5"/>
+    <path d="M 283.5 141.5 L 288 130.5 L 292.5 141.5 M 285.4 137.6 H 290.6" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="200" cy="74" r="11" stroke="#FFFFFF" stroke-width="2.5"/>
+</svg>
