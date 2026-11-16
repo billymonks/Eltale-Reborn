@@ -56,8 +56,8 @@ Modern adds a free camera on the right stick, a focus camera that swings behind 
 | Right stick   | Camera                                      |
 | A             | Talk, confirm, attack                       |
 | B             | Cancel, close menus                         |
-| X             | Item menu                                   |
-| Y             | Sprint                                      |
+| X             | Sprint                                      |
+| Y             | Item menu                                   |
 | D-pad         | Magic                                       |
 | Left trigger  | Focus camera                                |
 | LB            | Zoom out, previous page or item             |
