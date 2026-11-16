@@ -64,11 +64,6 @@ typedef struct {
 #define gBattleCameraYawOffset (*(volatile f32*)0x80086EFC)
 #define gBattleCenterX (*(volatile f32*)0x8008C59C)
 #define gBattleCenterZ (*(volatile f32*)0x8008C5A0)
-#define gBrianState (*(volatile u16*)0x8007BAB8)
-#define gBrianTimer (*(volatile u16*)0x8007BABC)
-#define BRIAN_STATE_FIELD 0
-#define BRIAN_STATE_TURN_BACK 15                        // turns Brian back to his pre-battle facing
-
 void func_80013D30(QCamera* cam);
 void func_80013008(QCamera* cam);                                       // CameraMode_Field
 void func_80013DE0(QCamera* cam, QVec3* target);                        // CameraTurnToAngle
@@ -82,8 +77,8 @@ f32 func_80023210(f32 y, f32 x);                                        // atan2
 #define DEG (PI / 180.0)
 #define STYLE_CLASSIC 0
 
-#define SNAP_FRAMES 8
-#define SNAP_PULL 0.40f
+#define SNAP_FRAMES 16
+#define SNAP_PULL 0.2f
 #define FIELD_PULL 0.005f
 #define FIELD_DRAG 0.8f
 #define BATTLE_PULL 0.5f
@@ -113,8 +108,6 @@ f32 func_80023210(f32 y, f32 x);                                        // atan2
 #define SIDE_MIN 0.35f
 #define SWING_EASE 0.2f
 #define LOCK_LEAD 0.157f
-#define ESCAPE_TURN_FRAMES 0x1C
-
 static f32 wrap(f32 a) {
     if (a > PI) {
         a -= TWO_PI;
@@ -387,8 +380,6 @@ static f32 sTilt;
 static u32 sFreeArea;
 static s32 sWasBattle;
 static s32 sFastYFrames;
-static s32 sEscapeTurn;
-
 static void free_leave(QCamera* cam) {
     if (sFree) {
         sFree = 0;
@@ -468,6 +459,7 @@ static s32 sActTimer;
 static f32 sActBehind;
 static u8 sLockPrev;
 static s32 sLockSnapFrames;
+static u8 sLockEasing;
 
 // Brian's action cameras swing behind him, and the saved battle camera is turned to match so it stays there after.
 static void act_begin(QCamera* cam) {
@@ -561,9 +553,9 @@ static s32 style_sync(QCamera* cam) {
             sFastYFrames = 0;
             sAimSet = 0;
             sActCam = 0;
-            sEscapeTurn = 0;
             sLockPrev = 0;
             sLockSnapFrames = 0;
+            sLockEasing = 0;
             sWasBattle = cam->mode == 4;
         }
         sStyleSeen = style;
@@ -576,7 +568,8 @@ RECOMP_PATCH void func_80013008(QCamera* cam) {
     u8 behind = 0;
     f32 sx, sy;
     QActorTransform* target;
-    s32 field = cam->mode == 0 || cam->mode == 2;
+    // Mode 5 holds for over a second after a battle before handing back to the field mode.
+    s32 field = cam->mode == 0 || cam->mode == 2 || cam->mode == 5;
     s32 battle = cam->mode == 4;
     s32 action = cam->flags & 0x40;
     s32 gated = (gGameState & 0x82) || (gBattleState & 0x200) || action;
@@ -596,25 +589,15 @@ RECOMP_PATCH void func_80013008(QCamera* cam) {
     recomp_get_camera_speed(&turn_speed, &tilt_speed);
 
     if (battle != sWasBattle) {
-        // After a win the game turns Brian back to his pre-battle facing; do the same after an escape.
-        if (sWasBattle && cam->mode == 5) {
-            sEscapeTurn = (gBattleState & 0x10) != 0;
-        }
         sTilt = 0.0f;
         sWasBattle = battle;
-    }
-    if (cam->mode != 5) {
-        sEscapeTurn = 0;
-    } else if (sEscapeTurn && gBrianState == BRIAN_STATE_FIELD) {
-        gBrianState = BRIAN_STATE_TURN_BACK;
-        gBrianTimer = ESCAPE_TURN_FRAMES;
-        sEscapeTurn = 0;
     }
     if (!battle) {
         sAimSet = 0;
         sActCam = 0;
         sLockPrev = 0;
         sLockSnapFrames = 0;
+        sLockEasing = 0;
     }
 
     camera_stick(FREE_DEAD, &sx, &sy);
@@ -688,6 +671,10 @@ RECOMP_PATCH void func_80013008(QCamera* cam) {
             cam->flags |= 0x04;
             cam->orbit_pull = SNAP_PULL;
             cam->orbit_drag = 0.0f;
+        } else if (battle && sLockEasing) {
+            // The battle spring overshoots a big swing.
+            cam->orbit_pull = SNAP_PULL;
+            cam->orbit_drag = 0.0f;
         } else if (battle) {
             cam->orbit_pull = BATTLE_PULL;
             cam->orbit_drag = BATTLE_DRAG;
@@ -717,6 +704,7 @@ RECOMP_PATCH void func_80013A20(QCamera* cam) {
     }
 
     if (cam->flags & 0x40) {
+        sLockEasing = 0;
         if (sActCam == 0 || cam->timer > sActTimer) {
             act_begin(cam);
         }
@@ -755,7 +743,9 @@ RECOMP_PATCH void func_80013A20(QCamera* cam) {
             f32 want = behind;
             if (!sLockPrev) {
                 sLockSnapFrames = SNAP_FRAMES;
+                cam->orbit_speed = 0.0f;
             }
+            sLockEasing = sLockSnapFrames > 0;
             if (sLockSnapFrames > 0) {
                 sLockSnapFrames--;
             } else {
@@ -764,6 +754,7 @@ RECOMP_PATCH void func_80013A20(QCamera* cam) {
             }
             gBattleCameraYawOffset = wrap(want - angle);
         } else {
+            sLockEasing = 0;
             camera_stick(FREE_DEAD, &sx, &sy);
             recomp_get_camera_speed(&turn_speed, &tilt_speed);
             gBattleCameraYawOffset = wrap(gBattleCameraYawOffset - BATTLE_TURN * turn_speed * sx);
